@@ -1,0 +1,5 @@
+Building:
+
+```
+cmake --build .
+```
