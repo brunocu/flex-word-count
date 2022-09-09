@@ -31,11 +31,11 @@ LETRA   [[:alpha:]]
     }
     bool has_vowel = false;
     // All words have at least 1 vowel
-    reg_ret = regexec(re_vowel, yytext, 0, NULL, 0);
+    reg_ret = regexec(re_vowel, yytext, 0, NULL, 0);    // /[aeiou]+/i
     if (reg_ret != 0)
     {
         // edge case: y
-        reg_ret = regexec(re_y, yytext, 0, NULL, 0);
+        reg_ret = regexec(re_y, yytext, 0, NULL, 0);    // /[^y].*y.*/i
         if (reg_ret != 0)
             REJECT; // all hope is truly lost
     }
@@ -45,14 +45,6 @@ LETRA   [[:alpha:]]
 .|\n    /* ignore all others */
 
 %%
-char *get_regerror (int errcode, regex_t *compiled)
-{
-  size_t length = regerror (errcode, compiled, NULL, 0);
-  char *buffer = malloc(length);
-  (void) regerror (errcode, compiled, buffer, length);
-  return buffer;
-}
-
 int main(int argc, char * argv[])
 {
     	++argv;
@@ -64,7 +56,7 @@ int main(int argc, char * argv[])
 
         // Compile regex exprs
         //  exit on failed compilation
-        re_vowel = malloc(sizeof(regex_t));
+        re_vowel = (regex_t *) malloc(sizeof(regex_t));
         if (!re_vowel)
             return(1);
         
@@ -72,7 +64,7 @@ int main(int argc, char * argv[])
         if (reg_ret != 0)
             return(1);
 
-        re_y = malloc(sizeof(regex_t));
+        re_y = (regex_t *) malloc(sizeof(regex_t));
         if (!re_vowel)
             return(1);
         
@@ -83,10 +75,11 @@ int main(int argc, char * argv[])
         yylex();
         printf("palabras: %d\n", palabras);
         
-        // free allocations
+        // free regex compile
         regfree(re_vowel);
-        free(re_vowel);
         regfree(re_y);
+        // free allocations
+        free(re_vowel);
         free(re_y);
     	return(0);
 }

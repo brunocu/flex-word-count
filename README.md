@@ -1,3 +1,8 @@
+- Cuenta palabras
+- Cuenta citas (guarda años)
+
+---
+
 Building:
 
 ```

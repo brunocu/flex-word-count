@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(word_count VERSION 0.1.0)
 
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED true)
+
 find_program(LEX_EXE
     flex
 )
@@ -8,7 +11,7 @@ if(LEX_EXE STREQUAL "LEX_EXE-NOTFOUND")
     message(FATAL_ERROR "flex executable not found")
 endif(LEX_EXE STREQUAL "LEX_EXE-NOTFOUND")
 
-# reuseable cmake macro for lex
+# lex source file macro
 MACRO(LEX_FILE _filename)
     GET_FILENAME_COMPONENT(_basename ${_filename} NAME_WE)
     ADD_CUSTOM_COMMAND(
