@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(word_count VERSION 0.1.0)
+project(flex-ej2 VERSION 0.1.0)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED true)
@@ -26,4 +26,4 @@ LEX_FILE(words.lex)
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/words.c GENERATED)
 # include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(word_count words.c)
+add_executable(flex-ej2 words.c)
