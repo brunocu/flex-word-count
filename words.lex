@@ -3,7 +3,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
-int N1,N2;
+const int N1 = 5;
+const int N2 = 4;
 %}
 %option pointer
 %option noyywrap
@@ -27,9 +28,9 @@ int main(int argc, char * argv[])
 {
     	++argv;
     	--argc;  
-    	if (argc < 4)
+    	if (argc < 2)
         {
-            puts("Use:\tflex-ej2 <archivo-entrada> <archivo-salida> <N1> <N2>\n");
+            puts("Use:\tflex-ej1 <archivo-entrada> <archivo-salida>\n");
             return(EINVAL);
         }
 
@@ -44,21 +45,6 @@ int main(int argc, char * argv[])
         if (yyout == NULL)
         {
             errno = EIO;
-            return(errno);
-        }
-        char *end;
-        N1 = strtol(argv[2], &end, 10);
-        if (argv[2] == end)
-        {
-            errno = EINVAL;
-            perror("<N1> debe ser un entero");
-            return(errno);
-        }
-        N2 = strtol(argv[3], &end, 10);
-        if (argv[3] == end)
-        {
-            errno = EINVAL;
-            perror("<N2> debe ser un entero");
             return(errno);
         }
 
