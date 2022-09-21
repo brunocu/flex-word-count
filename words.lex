@@ -1,7 +1,9 @@
 %{
 #include <stdio.h>
 
-int palabras = 0;
+int word_count = 0;
+int line_count = 0;
+int char_count = 0;
 %}
 %option pointer
 %option noyywrap
@@ -9,7 +11,7 @@ int palabras = 0;
 LETRA   [[:alpha:]]
 %%
 {LETRA}+    {
-    palabras++;
+    word_count++;
     char *word = yytext;
     for(int i = 0; i < (yyleng-1); i++)
     {
@@ -19,7 +21,9 @@ LETRA   [[:alpha:]]
         word++;
     }
 }
-.|\n    
+\n    ++char_count; ++line_count;  
+.     ++char_count;
+
 
 %%
 int main(int argc, char * argv[])
@@ -32,6 +36,9 @@ int main(int argc, char * argv[])
             return(1);
     
     	yylex();
-        printf("palabras: %d", palabras);
+        printf("Caracteres: %d\n", char_count);
+        printf("Palabras: %d\n", word_count);
+        printf("Líneas: %d\n", line_count);
+        
     	return(0);
 }
