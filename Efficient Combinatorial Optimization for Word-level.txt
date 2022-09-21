@@ -1,986 +1,0 @@
-Efficient Combinatorial Optimization for Word-level Adversarial Textual Attack
-Shengcai Liu, Member, IEEE, Ning Lu, Student Member, IEEE, Cheng Chen, Member, IEEE, Ke Tang, Senior Member, IEEE,
-
-
-
-
-  Abstract—Over the past few years, various word-level textual attack approaches have been proposed to reveal the vulnerability of deep neural networks used in natural language processing. Typically, these approaches involve an important optimization step to determine which substitute to be used for each word in the original input. However, current research on this step is still rather limited, from the perspectives of both problem- understanding and problem-solving. In this paper, we address these issues by uncovering the theoretical properties of the problem and proposing an efficient local search algorithm (LS) to solve it. We establish the first provable approximation guarantee on solving the problem in general cases. Extensive experiments involving 5 NLP tasks, 8 datasets and 26 NLP models show that LS can largely reduce the number of queries usually by an order of magnitude to achieve high attack success rates. Further experiments show that the adversarial examples crafted by LS usually have higher quality, exhibit better transferability, and can bring more robustness improvement to victim models by adversarial training.
-  Index Terms—textual attack, adversarial examples, word-level substitution, combinatorial optimization
-
-I. INTRODUCTION
-
-
-Original Input
-
-Substitute Words
-
-Adversarial Example
-
-Fig. 1. Simple examples showing sememe-based word substitution [16] (the left) and synonym-based word substitution [14] (the right), as well as the final crafted adversarial examples.
-
-
-model weights or gradients, but can only submit a limited number of input queries and then receive the corresponding model predictions. These facts give rise to the black-box approaches that directly modify the original input to craft adversarial examples, without utilizing the internal information of the victim models. Depending on where the modification is applied, these approaches can be further categorized into character-level manipulation [11]–[13], word-level substitution [10], [14]–[21], and sentence-level paraphrasing [22], [23].
-
-     NDERSTANDING the vulnerability of deep neural net- works (DNNs) to adversarial examples [1], [2] has emerged as an important research area, due to the wide range of applications of DNNs. Generally, adversarial examples are crafted by maliciously perturbing the original input, with the goal of fooling the target DNNs into producing undesirable behavior. In image classification and speech recognition, ex- tensive studies have been conducted for devising effective adversarial attacks [2]–[5], as well as further improving ro-
-bustness and interpretability of DNNs [6].
-  In the area of Natural Language Processing (NLP), moti- vated by the threats of adversarial examples in key applications such as spam filtering [7] and malware detection [8], there has been considerable attempt on addressing textual attacks for various NLP tasks [9]. Unlike image attack, for textual attack it is difficult to exploit the gradient of the network with respect to input perturbation, due to the discrete nature of texts [10]. Moreover, in realistic settings (e.g., attacking web service such as Google Translate), the attacker usually has no access to the
-  The authors are with the Research Institute of Trustworthy Autonomous Systems, Southern University of Science and Technology, Shenzhen 518055, China, and the Guangdong Key Laboratory of Brain-Inspired Intelligent Computation, Department of Computer Science and Engineering, Southern University of Science and Technology, Shenzhen   518055, China (e-mail: liusc3@sustech.edu.cn, 11610310@mail.sustech.edu.cn, chenc3@sustech.edu.cn, tangk3@sustech.edu.cn). Corresponding author: Cheng Chen.
-
-Among them the word-level attack has attracted the most research interest, due to its good performance on both attack efficiency and adversarial example quality [24], [25].
-  In general, word-level attack approaches adopt a two-step strategy to craft adversarial examples [16]. At the first step, they construct a set of candidate substitutes for each word in the original input, thus obtaining a discrete search space. As shown in Figure 1, although different attack approaches have used different word substitution methods, they all have the same goal here — making the potential adversarial exam- ples in the search space valid, meanwhile maintaining good grammaticality and naturality.
-  At the second step, these approaches solve the induced combinatorial optimization problem by determining for each word which substitute should be used, to finally craft an adversarial example. It is conceivable that the optimization algorithm used at this step is crucial for the overall attack performance. Previous studies have explored various options, including population-based search algorithms [10], [16], [21],
-[25] and simple heuristics [14], [17], [18]. However, there still exist some important issues that remain unsolved. First, from the theoretical perspective, little is known about the hardness of the optimization problem considered here, nor the performance guarantee which we can achieve on it. Second, from the practical perspective, the currently adopted optimiza- tion algorithms cannot achieve good trade-offs between attack
-
-success rates and query efficiency, considering that either low success rates or low query efficiency will make the attack approach less practical [15], [25]. Specifically, population- based algorithms need to perform excessive model queries to maintain a high attack success rate. In contrast, simple heuristics perform much fewer queries, but they cannot achieve satisfactory success rates. A further observation is that the optimization algorithm used in this step is actually independent of the word substitution method used in the first step. This means a powerful optimization algorithm can be used in combination with all existing word substitution methods to achieve the best possible attack performance. Moreover, it can also be used as a plug-and-play algorithm for the optimization module of future attack approaches.
-  Based on the above observations, in this work we focus on the optimization step of word-level textual attack and address the aforementioned two issues. We first formulate the combinatorial optimization problem as the Set Maximization with Partition Matroid Constraints which has been proven to be NP-Hard. Then we present a simple yet powerful local search algorithm (dubbed LS) for solving it. Intuitively, LS maximizes the marginal gain in each search step while con- sidering multiple types of textual perturbations, which enables it to terminate quickly without performing excessive queries. We prove an approximation bound of its performance, which is the first performance guarantee on solving the considered problem in general cases.
-  We conduct large-scale experiments to evaluate LS. Specifi- cally, we consider five representative word-level textual attack approaches in the literature and compare LS with their origi- nal optimization algorithms. The whole experiments involve
-5 NLP tasks, 8 datasets and 26 NLP models. The results demonstrate that LS consistently outperforms the baselines. Compared with population-based algorithms, it dramatically reduces the number of queries usually by an order of magni- tude, while achieving the same or even higher attack success rates. Compared with simple heuristic algorithms, it obtains much higher success rates, with a reasonable number of additional queries. Moreover, further experiments show that compared to the adversarial examples crafted by the baselines, the ones crafted by LS typically have higher quality and comparable validity, exhibit better transferability, and can bring larger robustness improvement to victim models by adversarial training.
-  The rest of the paper is organized as follows. Section II presents a literature review on adversarial textual attack. Section III first formally defines the induced combinatorial optimization problem and investigates its main characteristics, and then presents the local search algorithm, followed by its approximation bound. Section IV compares the proposed algorithm with the optimization algorithms of the state-of- the-art textual attack approaches in various attack scenarios. Finally, Section V concludes the paper and discusses the potential future directions.
-II. RELATED WORK
-  As aforementioned, existing adversarial textual attacks can be roughly classified into sentence-level, word-level, and
-
-character-level attacks, depending on where the perturbation of the original input is applied. Sentence-level attacks can be crafted through paraphrasing [22], [23], performing per- turbations in the continuous latent semantic space [20], and adding distracting sentences [26]. However, adversarial exam- ples crafted by these approaches usually have significantly different forms from the original input and therefore it is difficult to maintain their validity. Character-level attacks are often crafted by random character manipulation such as swap, substitution, deletion, insertion and repeating [11]–[13], [15]. In addition, there have also been attempts on exploiting the gradients of the victim model to guide the process of character substitution, with the help of one-hot character embeddings [27]. Although character-level attacks can achieve high success rates, they often break the grammaticality and naturality of original input and there has been evidence in the literature that character-level attacks can be easily defended [24].
-  Compared to character-level and sentence-level attacks which tend to break either grammaticality or validity of the original input, word-level attacks usually perform well on both attack efficiency and adversarial example quality. As aforementioned, generally a word-level attack approach can be decomposed into two steps: word substitution and optimization. For the former, many approaches have used synonyms [14], [17], [21], [25], infections [18] or the words with the same sememes [16], as the candidate substitutes. Another popular choice is to leverage language models [19] or word embeddings [15], [28] to filter out inappropriate words. The combination of the above two has also been explored [10]. As for the optimization step, existing studies have adopted population-based search algorithms including genetic al- gorithm [10], [21], [25] and particle   swarm   optimiza- tion [16]. Other approaches mainly use simple heuristics such as saliency/importance-based greedy substitution [14], [15], [17], [19] which first sorts words according to their saliency/importance and then finds the best substitute for each word in turn, and sequential greedy substitution [18] which se- quentially finds the best substitute for each word in the original input. However, for the optimization problem considered here, its theoretical properties are still unclear. In addition, there is still much room for improvement regarding query efficiency and attack success rates. It is worth mentioning there has been some well-designed toolboxes such as TextAttack [29] that provides interfaces to easily construct textual attacks from
-combinations of novel and existing components.
-  Finally, textual attacks can also be categorized according to the accessibility to the victim model, i.e., white-box and black- box attacks. White-box attacks require full knowledge of the victim model to perform gradient computation [27], [30]–[33], which however is often unavailable in practice. In contrast, black-box attacks [10], [14]–[23], [34], [35] only require the output of the victim model. The present work falls into this category and assumes the class probabilities or confidence scores of the victim model are available.
-III. METHODS
-  In the optimization step of word-level textual attack, we are given an original input x = w1...wi...wn, where n is
-
-the word number and wi is the i-th word. Let Bi denote the set of candidate substitutes for wi (note Bi can be empty). To craft an adversarial example xadv, for each wi in x, we can select at most one word from Bi to replace it (if none is selected, wi remains unchanged). For example, in the left part of Figure 1, we select “like” from B2 and “film” from B4 to replace w2 (“love”) and w4 (“movie”), respectively. The goal is then to find xadv that maximizes the objective function f (xadv), with as few model queries as possible. In the literature, the commonly considered f (xadv) is the predicted probability on a specific wrong class [16], i.e., targeted attack, or one minus the predicted probability on the ground truth [14], i.e., untargeted attack.
-
-A. Problem Formulation
-  Formally, let [n] , 1, 2, ..., n and V , i [n] Bi. We first notice that crafting xadv is equivalent to selecting a subset
-S   V  s.t.   S   Bi   1,  i   [n]  1.  For  example,  the adversarial example in the left part of Figure 1 corresponds to the subset “like”, “film” . Henceforth, we use xadv and its corresponding S interchangeably. Let di be integers s.t.
-1    di    Bi ,  i    [n]. Equivalently, the considered problem is actually a special case of the following problem with di = 1, ?i ? [n]:
-max f (S) s.t. |S ? B | ? d , ?i ? [n].	(1)
-
-
-
-Algorithm 1: Local Search Algorithm
-
-
-input: objective function f : 2V ? R; disjoint subsets
-B1, ..., Bn ? V ; integers d1, ..., dn s.t.
-1 ? di ? |Bi|, ?i ? [n];
-1
-2 while true do
-3	/* -----insertion-----	*/
-4	Let e ? V \ S maximizing f (S ? {e}) ? f (S) s.t.
-|(S ? {e}) ? Bi| ? di, ?i ? [n];
-5	S1 ? S ? {e};
-6	/* -----deletion------	*/
-7	Let e ? S maximizing f (S \ {e}) ? f (S);
-8	S2 ? S \ {e};
-9	/* -----exchange------	*/
-10	Let e ? S and v ? V \ S maximizing
-f (S \ {e} ? {v}) ? f (S) s.t.
-|(S \ {e} ? {v}) ? Bi| ? di, ?i ? [n];
-11	S3 ? S \ {e} ? {v};
-12	/* ----update S  ----	*/
-13	if maxA?{S1 ,S2 ,S3 } f (A) > f (S) then
-14	S	arg maxA  S1 ,S2 ,S3  f (A);
-15	else break;
-16 end
-17   if |(V  \ S) ? Bi| ? di, ?i ? [n] then
-18	return arg maxA?{S,V \S} f (A);
-
-i	i
-S?V
-
-19   else return S;
-
-
-
-In the literature, the problem in Eq. (1) is dubbed the Set Maximization with Partition Matroid Constraints, which has been proven to be NP-hard [36] in general cases. Using the naive exhaustive search to find the exact solution to
-
-
-“get”, we obtain f (X) = 2.432E-5, f (X ? {e}) = 2.724E-5,
-f (Y ) = 2.664E-5 and f (Y ? {e}) = 3.141E-5. Then f (X ?
-
-classical results [37] have shown that the conventional greedy algorithm can achieve (1 1/e)-approximation if f is mono- tone submodular (see the definitions below). Moreover, if f is non-monotone submodular, the greedy algorithm achieves
-
-which contradicts with Definition 2. On the other hand, even if f is not strictly submodular, we can still maximize f to a substantial extent by finding a local optimal solution to it. Actually, by characterizing how close f is to submodularity,
-
-1 (1 ? e??d¯/d)-approximation [38], where d = ?
-
-i?[n]
-
-di,
-
-we can strictly bound the gap between the local optimal
-
-d¯ = maxi?[n] di and ?       0 is a parameter bounding the
-maximum rate with which f changes.
-Definition 1. A set function f : 2V ? R is monotone if for any X ? Y ? V , f (X) ? f (Y ).
-Definition 2. A set function f : 2V ? R is submodular if for any X ? Y  ? V  and any e ? V \ Y , f (X ? {e}) ? f (X) ? f (Y ? {e}) ? f (Y ).
-  Intuitively, submodular functions exhibit a diminishing re- turns property that the marginal gain of adding an element diminishes as the set size increases. Unfortunately, in the case of textual attack, f can be non-submodular. For example, in the right part of Figure 1, suppose we consider targeted attack for sentiment analysis and f is the predicted probability on the
-“negative” label. Using BERT [39] trained on IMDB data [40] as the victim model, for X = ?, Y  = {“cinema”} and e =
- 1This requires that B1, ..., Bn are disjoint, which can be guaranteed by adding a position-aware prefix to each word in B1, ..., Bn, For example, if B2 and B4 have a common element (word) “like”, then the one in B2 is changed to “2 like” while the other in B4 is changed to “4 like”, such that they are distinguished.
-
-solution and the optimum of f . That is to say, no matter
-whether f is submodular or not, our proposed local search algorithm always achieves a provable performance guarantee when maximizing it. In below, we first present the local search algorithm, and then establish its performance guarantee.
-
-B. The Local Search Algorithm
-  The proposed local search algorithm (LS) is outlined in Algorithm 1. In brief, LS is an iterative procedure that stats from an empty set (line 1), and at each step (lines 2-16) considers three types of one-item perturbations to the selected subset S and chooses the one that improves the objective at most (lines 12-14). Specifically, the considered perturbations include: 1) inserting one item from V S to S (lines 3-5); 2) deleting one item from S (lines 6-8); 3) exchanging one item from S with another item from V   S (lines 9-11). Note that only valid perturbations that result in feasible S are considered. The algorithm terminates when no possible improvement can
-be found (line 15), and returns the better one between S and its complement V \ S (if it is feasible, see lines 17-19).
-
-  When using LS to solve the optimization problem in word- level textual attack, the considered three types of one-item perturbations to S correspond exactly to three types of one- word changes to the adversarial example xadv. To illustrate this, we take the left part of Figure 1 as an example, where the original input x = “I love this movie” and V = “like”,“favor”,“film”,“picture” . Suppose the current selected subset S = “like” ; therefore the corresponding adversarial example xadv = “I like this movie”. Then the three types of one-item perturbations to S and the corresponding one-word changes to xadv are as follows:
-1) insertion: inserting “film” or “picture” from V    S into S, which corresponds to substituting the word “movie” in xadv with “film” or “picture”;
-2) deletion: deleting “like” from S, which corresponds to substituting the word “like” in xadv with the original word “love”;
-3) exchange: exchanging “like” in S with “favor” from V S, which corresponds to substituting the word “like” in xadv with “favor”.
-
-three types of perturbations in LS. We then have the following lemma.
-Lemma 1. Let S be the solution obtained by running LS, then
-S is a local optimum on f defined in Eq. (1).
-Proof. Suppose S is not a local optimum, then there exists an element e satisfying one of the following three conditions: 1) e     V     S  and f (S) < f (S       e  ); 2) e     S  and f (S) < f (S      e ); 3) e      S and there exists v      V     S, f (S) < f (S e v ). This implies LS must not terminate with S. Contradiction.
-  Note that Lemma 1 holds regardless of f being submodu- lar. The following theorem presents an approximation bound achieved by any local optimum on f in Eq. (1), which also holds for the solution found by LS due to Lemma 1.
-Theorem 1. Let C be an optimal solution for the problem defined in Eq. (1) and S be a local optimum. Then we have:
-2f (S) + f (V \ S) ? f (C) + max{??f (V, 2),
-??f (V, 2) + ?f (S, |C \ S|)},
-
-All these one-word changes to x
-
-adv
-
-will be evaluated and the
-
-where ?  (·, ·) is the submodularity index [41], ? =  |S\C|  +
-
-adv
-
- |C\S| +|S ? C|· |S|+|C \ S|· |S ? C| and ? = ? ? |C\S| +
-
-  The total number of queries consumed by LS is also bounded. First, LS will perform at most O(|V |) queries at
-
-2	2
-|C \ S|.
-
-one step (lines 3-11). Besides, we can slightly modify the
-inequality condition in line 13 by adding a small positive constant ? to its right-hand side, to ensure that at every step the objective improvement is no less than ?. Since the value range of the objective function f considered in textual attack is finite (typically very small), e.g., if f is the predicted probability then its value range is 1, the algorithm will perform at most
-O(1/?) steps. This means the total query number is O(|V |/?).
-  
-The proof is given in the next section. Since the previous bound [38] for the problem defined in Eq. (1) only holds in submodularity case, to compare our bound with it, we further refine our bound in this case. If f is submodular, the submodularity index ?f is strictly non-negative [41]; then we have 2f (S) + f (V  S)   f (C), which immediately implies the following result.
-Corollary 1. If f is submodular, then f (S) ? 1 f (C) or f (V \
-
-  It is worth mentioning that if only the insertion perturbation is used, then LS degenerates to the conventional greedy algorithm [37]. We have also tested the greedy algorithm in the experiments (see Appendix B), and find it consistently performs worse than LS in terms of attack success rates, which indicates the necessity of considering deletion and exchange perturbations. Below we establish the first performance guar- antee on solving the problem in Eq. (1) in general cases.
-
-C. Approximation Bound
-  In a nutshell, we use the submodularity index [41] to characterize how close f is to submodularity, and establish an approximation bound that holds for any local optimum (such
-
-
-
-3
-S) ? 1 f (C).
-  Corollary 1 indicates that in submodularity case LS can achieve 1 -approximation on f . Further, we can obtain an even better bound based on a mild assumption. The assumption is that there exists a Bi with Bi > 2. If this is true, then the solution V   S must be infeasible, i.e., f (V    S) = 0; therefore we have 2f (S)     f (C), which indicates that LS can achieve 1 -approximation on f , as stated in Corollary 2.
-Corollary 2.  If f is submodular and ?i ? [n] such that |Bi| >
-2, then f (S) ? 1 f (C).
-We now compare the above bounds with the previous
-bound   1 (1 ? e??d/d) [38]. Considering the case where
-
-?	¯
-
-as the solution S  found by LS) on f . Note we assume f is
-non-negative, which is true in word-level textual attack, and
-
-di = 1, ?i ? [n], we have d = maxi?[n] di = 1, then the
-previous bound equals to 1 (1 ? e??/d), where ? ? 0 and
-
-we set f (S) = 0 for any infeasible solution S. We first give	d  =
-
-i?[n] di. Figure 2 illustrates the contour lines of the
-
-the formal definition of local optimum.
-
-functions 1 (1 ? e??/d) ? 1 and 1 (1 ? e??/d) ? 1 . It can
-
-?	3	?	1	2
-
-Definition 3. Given a set function f : 2V ? R, S is a local
-
-be seen that in submodularity case our 3 -approximation and
-
-optimum, if f (S) ? f (S ? {e}) for any e ? V  \ S, f (S) ? f (S \ {e}) for any e ? S, and f (S) ? f (S \ {e} ? {v}) for any e ? S and v ? V \ S.
-  The three conditions (insertion, deletion and exchange) for being a local optimum in Definition 3 correspond exactly to the
-
-1 -approximation bounds beat the previous bound with d ? 3
-and d ? 2, respectively.
-D. Proof of Theorem 1
-  We first introduce the definition of Submodularity Index (SmI) [41], which measures the degree of submodularity. Then
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1	2	3	4
-
-
-
-
-
-Fig.  2.   Contour  lines  of  the  functions   1 (1 ? e??/d) ? 1  (the  left)  and
-
-Proof. Let I = I0 ? I1 ? · · · ? Ik = S be a chain of sets where Ii \ Ii?1 = {ai}. For ?i ? [k], by Lemma 2, we have
-f (Ii) ? f (Ii?1) ? f (S) ? f (S \ {ai})
-+ (k ? i)?f (S \ {ai} , 2) .
-Since f (S)	f (S	e ) holds for any e	S, by the property of SmI, we have
-f (Ii) ? f (Ii?1) ? (k ? i)?f (S, 2).
-By telescoping sum, it holds that
-
-1 (1 ? e??/d) ? 1  (the  right).  Note  negative  value  in  the  figures  indicate	?
-
-
-the function value is always negative when d ? 2.
-
-
-
-=    |S \ I|   
-
-
-?f (S, 2).
-
-we establish two lemmas (Lemma 4 and Lemma 6) that relate SmI with the three conditions (insertion, deletion and exchange) for being a local optimum in Definition 3. Finally, we prove Theorem 1 based on these lemmas.
-Definition 4. The submodularity index for a set function f : 2V ? R, a set L, and a cardinality k, is defined as
-
-Similarly, let S = I0 ? I1 ? · · · ? Ik = J be a chain of sets where Ii \ Ii?1 = {ai}. For ?i ? [k], by Lemma 2, we have
-f (Ii) ? f (Ii?1) ? f (S ? {ai}) ? f (S)
-— (i ? i)?f (Ii?1, 2) .
-Since f (S)	f (S	e ) holds for any e	V	S, by the property of SmI, we have
-
-?f (L, k) ,	min
-A?L
-S?A=?,|S|?k
-
-?f (S, A),
-
-f (Ii) ? f (I
-
-i?1
-
-) ? ?(i ? 1)?f
-
-(J, 2).
-
-where ?f (S, A) , ?x?S fx(A) ? fS(A) and fS(A) , f (A ?
-
-By telescoping sum, it holds that
-?
-
-S) ? f (A).
-It  is  straightforward  to  verify  that  ?I  ? J,  SmI  satisfies
-
-f (J) ? f (S) ? ?
-
-
-
-i=1
-
-(i ? 1)?f (J, 2)
- 
-
-?f (I, k) ?f (J, k). The following two lemmas bound the degradation in submodularity with SmI, and the increase in f -value as the set size increases, respectively.
-
-= ?	|J \ S|
-
-?f (J, 2).
-
-
-
-Lemma 2.  Let A be an arbitrary set, B = A ? {y1, ..., yM }
-and x ? B. Then fx(A) ? fx(B) ? M?f (B, 2).
-Proof. See Lemma 3 in [41].
-
-Lemma 3. Let Y be an arbitrary set, A	B, and Y B = ?, then
-f (A ? Y ) ? f (A) ?f (B ? Y ) ? f (B)
-+ |B \ A| · |Y | · ?f (B ? Y, 2).
-Proof. See Lemma 4 in [42].
-
-  By the following lemma, we relate SmI with the first two conditions (insertion and deletion) for being a local optimum in Definition 3.
-Lemma 4. Let S be a feasible solution to the problem in Eq. (1). If f (S)	f (S		e ) for any e	V	S   and  f (S) f (S	e ) for any e	S, then for any I		S	J, the following holds.
-   |S \ I|   
-  
-Below we consider the third condition (exchange) for being a local optimum in Definition 3. We first introduce the well- known exchange property of matroids in Lemma 5. Intuitively, this property states that for any two feasible solutions I and J, we can add any element of J to the set I and remove at most one element from I while keeping it feasible. Moreover, each element of I is allowed to be displaced by at most one element of J.
-Lemma 5 (Theorem 39.6 in [43]). Let I, J be two feasible solutions to the problem in Eq. (1). Then there is a mapping ? : J \ I ? (I \ J) ? {?} such that
-1) (I \ ?(b)) ? {b} is feasible for all b ? J \ I
-2) ??1(e) ? 1 for all e ? I \ J.
-  By the following lemma, we relate SmI with the second condition (deletion) and the third condition (exchange) for being a local optimum.
-Lemma 6.  Let S be a feasible solution to the problem in Eq. (1). If f (S) ? f (S \ {e}) for any e ? S, and f (S) ? f (S \ {e} ? {v}) for any e ? S and v ? V \ S. Then for any
-
-
-f (J) ? f (S) ?     |J \ S|    ?f (J, 2).
-
-2f (S) ? f (S ? C) + f (S ? C)+
-??f (V, 2) + ?f (S, |C \ S|),
-
-TABLE I
-DETAILS  OF  THE  TEXTUAL  ATTACK  APPROACHES  CONSIDERED  IN  THE  EXPERIMENTS.
-
-Attack Approach	Optimization Algorithm	Objective Function	Constraints	Word Substitution
-
-PSO
-Zang et al. [16]
- 
-Particle Swarm Optimization (PSO)
-   
-Sememe (HowNet word swap)
-
-GA	Genetic Algorithm (GA)	Targeted
-
-Percentage of words Perturbed, Language model perplexity, Word embedding distance
-
-
-Counter-fitted word embedding swap
-
-pwws
-Ren et al. [14]
- morpheus Tan et al. [18]
-    
-Saliency-based Greedy Substitution (SBGS)
-Sequential Greedy Substitution (SGS)
-   
-Synonym (WordNet word swap)
-
-Minimizing BLEU Score	-	Infectional Morphology
-
-
- TextFooler Jin et al. [17]
-
-
-   Importance-based Greedy Substitution (IBGS)
-
-Untargeted,
-
-Word embedding distance, Part-of-speech match,
-USE sentence encoding cosine similarity
-
-
-Counter-fitted word embedding swap
-
-Ours	Local Search (LS)
-
-
-
-where ? = |S\C|  + |C \ S|.
-    
-Targeted,	Depending on the approach in which LS is embedded Minimizing BLEU Score
-
-
-We now prove Theorem 1 using the above lemmas.
-
-Proof. By definition of SmI, we have
-f (S ? C) ? f (S) ?
-
-Proof. By Lemma 6, the following holds.
-2f (S) ? f (S ? C) + f (S ? C)
-
-
-
-(2)
-
-b??C\S
-
-[f (S ? {b}) ? f (S)] ? ?f
-
-(S, |C \ S|).
-
-+ ??f (V, 2) + ?f (S, |C \ S|).
-Also by Lemma 3, we have
-
-Also, by Lemma 2,
-fb(S) ? fb(S \ {?(b)}) ? ?f
-
-
-
-(S, 2).
-
-f (S ? C) + f (V \ S)
-? f (C \ S) + f (V ) + |S ? C| · |S| · ?f (V, 2)
-
-
-? f (C \ S) + |S ? C| · |S| · ?f (V, 2)
-
-
-(3)
-
-Therefore, it holds that:
-f (S ? C) ? f (S) ?
-[fb(S \ {?(b)}) ? ?f (S, 2)] ? ?f (S, |C \ S|).
-b?C\S
-It remains to investigate	b  C  S fb(S \{?(b)}). Since for any
-e ? S and v ? V \ S, f (S) ? f (S \ {e} ? {v}), it holds that
-
-f (S ? C) + f (C \ S)
-? f (C) + f (?) + |C \ S| · |S ? C| · ?f (C, 2)
-? f (C) + |C \ S| · |S ? C| · ?f (C, 2).
-Summing the inequalities (2)-(4), we have
-2f (S) + f (V \ S) ?f (C) + ??f (S, 2)
-
-
-(4)
-
-fb(S \ {?(b)}) ? f (S) ? f (S \ {?(b)}). Further, by Lemma 5 and the fact f (S) ? f (S \ {?(b)}),
-
-+ ?f (S, |C \ S|)
-+ |S ? C| · |S| · ?f (V, 2)
-
-b??C\S
-
-[f (S) ? f (S \ {?(b)})] ?
-b?S\C
-
-[f (S) ? f (S \ {b})].
-
-+ |C \ S| · |S ? C| · ?f (C, 2).
-By the fact ?f (·, 2) ? ?f (V, 2),
-
-Let I = S ? C, and Let I = I0 ? I1 ? · · · ? I|S\C| = S be a chain of sets where Ii \ Ii?1 = {ai}. Then by Lemma 2,
-
-2f (S) + f (V \ S) ? f (C)+??f (V, 2)+
-?f (S, |C \ S|),
-
-(5)
-
-f (Ii) ? f (Ii?1) ?
-f (S) ? f (S \ {ai}) + (|S \ C| ? i)?f (S \ {ai} , 2) .
-By telescoping sum,
-
-where ? is defined as in Theorem 1. For the other half, let
-I = S ? C and J = S ? C in Lemma 4, the following holds.
-2f (S)	f (S	C) + f (S	C)+
-   |S \ C|    ?f (S, 2) +    |C \ S|    ?f (S ? C, 2).
-
-?  [f (S) ? f (S \ {b})] +    |S \ C|    ?f (S, 2).
-
-(6)
-Similarly, by summing the inequilities (3)(4)(6), we have
-
-b?S\C
-Summing the above results, we have:
-
-2f (S) + f (V \ S) ?f (C) +
-
-|S \ C|
-
-
-?f (S, 2)
-
-f (S ? C) ? f (S) ? f (S) ? f (S ? C)
-
-+  |C \ S|    ?
-
-
-
-(S ? C, 2)
-
- 
-
-The proof is complete.
-
-+ |C \ S| · |S ? C| · ?f (C, 2).
-
-TABLE II
-DETAILS  OF  THE  ATTACK  SCENARIOS   CONSIDERED   IN   THE   EXPERIMENTS,  CATEGORIZED   BY   THEIR   SOURCE   PUBLICATIONS.  “BASELINE”  REPRESENTS THE ORIGINAL OPTIMIZATION  ALGORITHM. “#AT. SAMPLES” REPRESENTS  THE  NUMBER  OF  THE  SAMPLES  FOR  ATTACKING. “TEST  PER.” REPRESENTS THE TESTING PERFORMANCE OF THE VICTIM MODELS. FOR THE TASK OF QUESTION ANSWERING, “TEST PER.” IS THE AVERAGE F1 SCORE. FOR
-MACHINE  TRANSLATION, “TEST  PER.” IS  THE  BLEU SCORE. FOR  OTHER  TASKS, “TEST  PER.” REFERS  TO  ACCURACY.
-
-Baseline	NLP Task	Dataset	Victim Model	Test Per. (%)	#AT. Samples
-BiLSTM	89.10	2719
-
-IMDB
-
-BERT	90.76	2707
-
-
-
-
-
-
-
-
-
-Saliency-based
-
-
-
-
-
-
-
-
-
-Sentiment Analysis	IMDB
-
-
-
-
-
-
-
-
-Word-CNN	88.26	2162
-BiLSTM	85.71	2112
-
-
-
-
-
-
-Sequential Greedy Substitution (SGS) Tan et al. [18]
-
-
-
-
-
-
-SQuAD 2.0
-(Answerable)
-
-
-
-
-Importance-based
-
-
-
-
-
-
-By the fact ?f (·, 2) ? ?f (V, 2),
-2f (S) + f (V \ S) ? f (C) + ??f (V, 2),	(7)
-where ? is defined as in Theorem 1. Based on inequilities (5) and (7), we finally have
-2f (S) + f (V \ S) ? f (C) + max{??f (V, 2),
-??f (V, 2) + ?f (S, |C \ S|)}.
-The proof is complete.
-
-IV. EXPERIMENTS
-  We conduct extensive experiments to evaluate our algorithm in various attack scenarios. Specifically, we repeat the set- tings considered by five recent open-source word-level attack approaches [10], [14], [16]–[18], and compare LS with their original optimization algorithms. These approaches are repre- sentative in the sense that they have employed different word- substitution methods and optimization algorithms, and have achieved the state-of-the-art attack performance for various NLP tasks and victim models. In addition, as the baselines, the optimization algorithms adopted by them represent the two mainstream choices in the literature: population-based algo- rithms and simple heuristics. Finally, the objective functions considered by them are also various, including the predicted probability on a specific wrong class (targeted attack) [10],
-
-[16], one minus the predicted probability on the ground truth (untargeted attack) [14], [17], and the model’s loss [18]. Morris et al. [29] presented a comprehensive comparison of previous textual attack approaches in terms of objective functions, constraints, perturbation strategies and optimization algorithms. Following [29], we present these details of all the considered word-level attack approaches in Table I. Note in the experiments, for each considered approach we replace its optimization algorithm with LS, and then compare it with the original approach. We use the fine-tuned models, datasets and attack approach implementations provided in their code repositories. All the codes, datasets, as well as the step-by- step instructions for repeating our experiments, are available at https://github.com/ColinLu50/NLP-Attack-LocalSearch.
-
-A. Attack Scenarios
-  Table II summarizes all the 26 different attack scenarios (each row is a unique scenario) considered in the experiments, which in total involve 5 NLP tasks, 8 datasets and 26 NLP models. From the perspective of optimization, each scenario in Table II represents a specific sub-class of instances of the optimization problem defined in Eq (1). Therefore, LS will be tested on 26 different sub-classes of problem instances, containing 75909 instances in total, which is expected to be sufficient for assessing its performance and robustness.
-
-TABLE III
- SUCCESS RATES AND AVERAGE QUERY NUMBER OF LS AND PSO IN ATTACK SCENARIOS INTRODUCED BY ZANG et  al. [16].  EACH  TABLE  CELL CONTAINS TWO VALUES, A SUCCESS RATE (%) AND AN AVERAGE QUERY NUMBER, SEPARATED BY “ ”. FOR PSO, ITS AVERAGE PERFORMANCE
-STANDARD DEVIATION ACROSS 10 REPEATED RUNS IS REPORTED. NOTE FOR SUCCESS RATE, THE HIGHER THE BETTER; FOR QUERY NUMBER, THE SMALLER THE BETTER.
-
-
-
-
-Alg.
-
-IMDB	SST-2	SNLI
-
-  
-BiLSTM	BERT	BiLSTM	BERT	BiLSTM	BERT
-
-
-
-PSO	99.84±.04|3613±14	94.78±.44|5375±32	93.71±.17|1269±13	89.40±.07|1642±11	72.83±.42|2931±71	76.39±.20|2151±32 LS		99.93|2220		94.16|4332		94.07|295		89.57|344		74.71|246		76.43|233
-
-TABLE IV
-SUCCESS RATES  AND  AVERAGE  QUERY  NUMBER  OF  LS AND  SGS IN  ATTACK  SCENARIOS  INTRODUCED  BY  TAN et al. [18].
-
-
-
-
-Alg.
-
-SQuAD 2.0 (Answerable)	SQuAD 2.0 (All)	newstest2014 (En-Fr)
-
-
-22.88|61	19.20|64	24.99|49	18.77|51	21.82|53	15.26|55	48.74|92	42.18|90
-
-TABLE V
-SUCCESS RATES  AND  AVERAGE  QUERY  NUMBER  OF  LS AND  IBGS IN  ATTACK  SCENARIOS  INTRODUCED  BY  JIN et al. [17].
-
-MRSNLIAlg.BERTWordLSTMWordCNNBERTInfersentESIM   IBGS	78.59|127.9	88.49|102.2	90.08|100.9	88.90|68.9	93.97|63.3	90.29|68.4 
-     LS	92.94|613.7	94.50|564.9	95.95|566.2	95.85|278.5	98.65|258.7	97.44|286.3 
-
-
-
-TABLE VI
-SUCCESS RATES AND AVERAGE QUERY NUMBER OF LS AND SBGS IN ATTACK SCENARIOS INTRODUCED BY REN et al. [14].
-
-IMDB	AG’s News
-
-
-TABLE VII
-SUCCESS RATES  AND  AVERAGE  QUERY  NUMBER  OF  LS AND  GA IN
-ATTACK SCENARIOS INTRODUCED BY ALZANTOT et al. [10]. FOR GA, ITS AVERAGE  PERFORMANCE	STANDARD DEVIATION ACROSS 10 REPEATED RUNS IS REPORTED.
-
-Alg.
-
-
- 
-Word-CNN	BiLSTM	Char-CNN	Word-CNN
-
-
-
-Alg.	IMDB+LSTM	SNLI+DNN
-
-
-SBGS	82.84|153	87.78|153	74.33|75	81.49|75
-      LS	85.62|599	92.28|579	82.62|165	87.54|173 
-
-
-
-GA	94.63±.54|2257±89	33.77±1.08|2989±41
-    LS	99.33|665	42.81|128	
-
-
-
-B. Experimental Setup
-    a) Algorithm Settings: For the baseline algorithms, we use their recommended hyper-parameter settings. Specifically, for PSO [16], Vmax, ?max, ?min, Pmax, Pmin and k are set to 1, 0.8, 0.2, 0.8, 0.2 and 2, respectively. For GA [10], N , K and ? are set to 8, 4 and 0.5, respectively. For both PSO and GA, the maximum number of iteration and the population size are set to 20 and 60. As for the three heuristics and LS, all of them are free of hyper-parameters.
-  All the algorithms will immediately terminate once they achieve successful attacks, which means the model predicts the targeted label for targeted attack, or any wrong label for untargeted attack. When maximizing the model’s loss [18], successful attacks mean the task’s score (e.g., F1 and BLEU) becomes 0.
-    b) Samples for Attacking: It is conceivable that the shorter the original input is, the fewer words in it that can be substituted, and therefore the more difficult it is to craft a successful adversarial example. For those too short inputs, it is possible that there exist no successful adversarial examples in the whole search spaces, in which cases comparing different
-
-algorithms is just meaningless. On the other hand, those too long inputs are too easy to be successfully attacked since there exist so many words in them that can be substituted. As a result, using these inputs for attacking cannot discriminate well between the search capabilities of different optimization algorithms. Based on the above considerations, in the exper- iments we restrict the lengths of the original inputs to 10- 100, following [10], [16]. Also, we consider the adversarial examples with modification rates higher than 25% as failed attacks. Previous studies [10], [14], [16] usually sample a num- ber (typically 1000) of correctly classified instances from the test sets as the original input for attacking, which however may introduce selection bias for assessing the attack performance. To avoid this issue, we use all the correctly classified testing instances for attacking, which usually leads to much more used samples compared to previous studies (see the last column of Table II). As aforementioned, in word-level textual attack, the objective function can be non-submodular (see Section III-A). To illustrate this, we randomly select 100 samples from each of AG’s news, SST-2 and IMDB datasets (their associated victim models are Word-CNN, BiLSTM and BERT, respectively), and
-
-run experiments to verify whether their objective functions are submodular. The detailed experimental results are available at https://github.com/ColinLu50/NLP-Attack-LocalSearch. It is shown that only one example from SST-2 has submodular objective function. This implies generally we can be almost sure that the objective function in word-level textual attack is non-submodular.
-    c) Evaluation Metrics: Similar to previous studies, we use attack success rates to assess the attacking ability. In addition, we also consider query number as the metric of attack efficiency. Concretely, attack success rate refers to the percentage of successful attacks, and the query number is the number of queries consumed by the optimization algorithms for attacking an example.
-
-C. Results and Analysis
-Tables III-VII present the attack success rates and the
-
-
-
-
-
-
-1.00
-
-
-
-
-0.75
-
-
-
-
-0.50
-
-
-
-
-0.25
-
-
-
-
-0.00
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-0	1000	2000	3000	4000
-Query Number
-
-average query number of LS and the corresponding baselines in each attack scenario. Considering PSO [16] and GA [10] are both randomized algorithms, to make fair comparison, we run these two algorithms for 10 times, and report their average performance.
-  The first observation from these results is that generally LS obtains higher success rates than the baselines. Actually, it per- forms better than the baselines in 25/26 scenarios. Compared with GA (Table VII) and the three heuristics SBGS (Table VI), IBGS (Table V) and SGS (Table IV), the advantage of LS in terms of success rates is particularly significant, ranging from 2.78% to 9.04%. Although PSO can achieve nearly competitive success rates to LS, the latter performs much better than PSO (and GA) in terms of query efficiency. No- tably, compared with these two population-based algorithms, in 6/8 scenarios LS dramatically reduces the query number by an order of magnitude. Compared with SBGS, IBGS and SGS, LS requires more queries. However, the amount of increase is usually reasonable (e.g., around 30 in Table IV) and therefore acceptable, considering LS achieves significantly higher success rates.
-  One may notice that the attack success rates in Table IV are much lower than others. This is due to the fact that the settings considered by Tan et al. [18] (e.g., the criteria of successful attacks, see Section IV-B), are much more challenging. Nevertheless, the high success rates obtained here on attacking popular models such as BERT and BiLSTM clearly demonstrate the vulnerability of DNNs.
-  It is meaningful to reveal how the theoretical results es- tablished in this paper relate to the practical performance of LS. Since Theorem 1 states that the gap between the score obtained by LS and the optimum is strictly bounded, we randomly select an example from SST-2 dataset 2 (the victim model is BERT) and enumerate all the possible adversarial examples in the search space to find the optimum and calculate the SmI, i.e., Submodularity Index (see Definition 4). Then based on these results we further calculate the lower bound
-   2Specifically, the example is “Well written, nicely acted and beautifully shot and scored, the film works on several levels, openly questioning social mores while ensnaring the audience with its emotional pull.”
-
-Fig. 3. The optimum, the lower bound, as well as the scores of the solutions found by LS and PSO on an example from the SST-2 dataset.
-
-of the score obtained by LS according to Theorem 1, and run LS and PSO on this example until termination. Finally, we illustrate the optimum, the lower bound, as well as the scores of the solutions found by LS and PSO in Figure 3. The first observation from Figure 3 is that the lower bound is very close to 0.5. This implies that LS will almost surely find a successful adversarial example because it is guaranteed to obtain a score not smaller than the lower bound. Indeed, LS achieves this goal and even approaches the optimum. In comparison, PSO lacks such guarantee and its performance can be arbitrarily bad. This sheds some light on the results of previous experiments that LS consistently achieves significantly higher attack success rates than the baselines. That is to say, Theorem 1 provides the worst-case performance guarantee for LS, while in practice LS can usually achieve much better scores than the theoretical lower bound.
-
-D. Adversarial Example Quality and Validity
-  We further evaluate the quality, validity and naturality of the crafted adversarial examples. The validity (evaluated by human) is measured by the percentage of successful adversar- ial examples with unchanged true labels. As for adversarial example quality, similar to [16], we consider modification rate, fluency, grammaticality, and perceptibility. Concretely, modification rate is the percentage of words in the adversarial examples that differ from the original input; fluency is mea- sured by the perplexity (PPL) of GPT-2 [44]. For grammati- cality, we obtain the increase in number of grammatical error of adversarial examples compared to the original input, with the help of LanguageTool (https://languagetool.org/), and then divide it by the length of original input to calculate the amount of increase per word processed (IPW). Unlike the metric used by [16] which measures the increase rate of grammical error, IPW measures the average increase of grammatical error as the attack approach processing one input word. Finally, the perceptibility refers to how indistinguishable the adversarial examples are from human-written texts.
-
-TABLE VIII
-EVALUATION  RESULTS  IN  TERMS  OF  MODIFICATION  RATE  (MODI.), GRAMMATICALITY  (IPW) AND  FLUENCY  (PPL), IN  THE  SCENARIOS  INTRODUCED BY ZANG et al. [16]. NOTE FOR ALL THESE THREE METRICS, THE SMALLER THE BETTER.
-
-
-
-Victim
-
-IMDB	SST-2	SNLI
-
-
-
-
-
-
-
-
-
-TABLE IX
-HUMAN EVALUATION RESULTS OF VALIDITY AND PERCEPTIBILITY OF THE CRAFTED ADVERSARIAL  EXAMPLES  ON  ATTACKING  BERT ON  SST-2, WITH SEMEME-BASED WORD SUBSTITUTION. THE SECOND ROW ALSO
- LISTS THE EVALUATION  RESULTS  OF  THE  ORIGINAL  INPUT. “VALID.” IS THE PERCENTAGE OF VALID ADVERSARIAL EXAMPLES. “PERCEP.” IS THE AVERAGE PERCEPTIBILITY SCORE. FOR BOTH OF THEM, THE HIGHER THE
-BETTER.
-Victim Model		Alg.	Valid. (%)	Percep. N/A	Ori. Input		87.0		3.46
-PSO	79.0	2.64
-
-
-TABLE X
-THE CLASSIFICATION ACCURACY OF THE TRANSFERRED ADVERSARIAL EXAMPLES CRAFTED BY  PSO AND  LS IN  THE  SCENARIOS  CONSIDERED BY ZANG et al. [16].
-
-Transfer	Alg.	IMDB	SST-2	SNLI
-
-
-PSO	80.70	69.47	61.40
-   BiLSTM ? BERT	LS	77.48	64.32	58.93 
-PSO	82.85	63.43	51.60
-   BERT ? BiLSTM	LS	79.40	59.06	49.71 
-
-BERT
-
-LS	78.0	2.69
-
-TABLE XI
-THE DECREASE IN ATTACK SUCCESS RATES (%) AFTER RETRAINING, WHEN ATTACKING BILSTM ON SST-2 WITH SEMEME-BASED WORD
-SUBSTITUTION. “ALG.” AND  “ADV. T” REPRESENT  THE  OPTIMIZATION
-
-  Table VIII presents the evaluation results in terms of modi- fication rate, fluency (PPL), and grammaticality (IPW), of the adversarial examples crafted in the scenarios introduced by Zang et al. [16]. Results in other scenarios are similar, and are given in Appendix A. The results in Table VIII indicate that in most scenarios the adversarial examples crafted by LS are
-better than that crafted by the baseline. It is worth mentioning the IPW in Table VIII is typically of the order 10?4, which means the attack approach introduces roughly 1 grammatical error for every 10000 input words processed.
-  We perform human evaluation on 100 adversarial examples crafted by PSO and LS respectively, for attacking BERT on SST-2 with sememe-based word substitution. We ask three movie fans (volunteers) to make a binary sentiment classifica- tion (i.e., labeling it as “positive” or “negative”), and give a perceptibility score chosen from 0, 1, 2, 3, 4 which indicates “Machine-generated”, “More like Machine-generated”, “Not Sure”, “More like Human-written” and “Human-written”, re- spectively. The final sentiment labels are determined by major- ity voting, and the final perceptibility scores are determined by averaging. Table IX presents the results. Overall the adversarial examples crafted by LS are comparable to that crafted by PSO, and both of them are inferior to original human-authored input. Nevertheless, based on human evaluation, overall the crafted examples (with average perceptibility score larger than 2) are more like human-written than machine-generated. Table XIII displays some adversarial examples crafted by LS and the baselines on IMDB dataset, with different word-substitution methods.
-
-E. Transferability
-  The transferability of an adversarial example refers to its ability to attack other unseen models [2]. We evaluate transfer-
-
-ALGORITHM   FOR   ATTACKING   AND   ADVERSARIAL   TRAINING,
-RESPECTIVELY. “W/O” MEANS THE (ORIGINAL) ATTACK SUCCESS RATES WITHOUT RETRAINING.
-
-   Alg. \ Adv. T		w/o	PSO		LS PSO	93.71	-2.29	-3.18
-LS	94.07	-2.28	-2.39
-
-
-
-
-ability in the attack scenarios introduced by Zang et al. [16], where the used sememe-based word-substitution often leads to better transferability than other word-substitution meth- ods. Specifically, on each dataset, we use BERT to classify the adversarial examples crafted for attacking BiLSTM, and vice versa. Table X presents the classification results on the adversarial examples crafted by LS and PSO. Note lower classification accuracy indicates better transferability. In can be observed that the adversarial examples crafted by LS generally exhibit better transferability than that crafted by PSO.
-
-F. Adversarial Training
-  By incorporating adversarial examples into the training process, adversarial training is aimed at improving the robust- ness of victim models [2]. Here we evaluate the robustness improvement in two attack scenarios. Under the first scenario
-
-TABLE XII
-THE DECREASE IN ATTACK SUCCESS RATES (%) AFTER RETRAINING, WHEN ATTACKING BERT ON IMDB WITH SYNONYM-BASED WORD
-SUBSTITUTION.
-
-   Alg. \ Adv. T		w/o	SBGS		LS SBGS	82.84		-7.40	-8.68
-LS	85.62	-5.45	-7.46
-
-
-
-
-
-
-TABLE XIII
-SOME  ADVERSARIAL  EXAMPLES  CRAFTED  BY  LS AND  THE  BASELINES  ON  IMDB DATASET, WITH  DIFFERENT  WORD-SUBSTITUTION  METHODS.
-
-IMDB Example 1
-
-Original Input (Prediction=Negative)
-I’m normally a fan of Mel Gibson, but in this case he did a movie with a poor script. The acting for the most part really wasn’t that bad, but the story was just pointless with flaws and boring.
-
-Synonym-based Word Substitution + LS (Prediction=Positive):
-I’m normally a fan of Mel Gibson, but in this case he did a movie with a short script. The acting for the most part really wasn’t that tough, but the story was just superfluous with flaws and boring.
-
-Synonym-based Word Substitution + SBGS (Prediction=Positive):
-I’m normally a fan of David Gibson, but in this type he did a movie with a short script. The acting for the most part really wasn’t that tough, but the story was just superfluous with flaws and boring.
-
-Counter-fitted Word Embedding Substitution + LS (Prediction=Positive):
-I’m normally a admirer of Mel Gibson, but in this case he did a movie with a needy script. The acting for the most part really wasn’t that bad, but the story was righteous vain with flaws and boring.
-
-Counter-fitted Word Embedding Substitution + GA (Prediction=Positive):
-I’m normally a admirer of Mel Gibson, but in this case he did a movie with a needy script. The acting for the longer
-part really wasn’t that amiss, but the tales was righteous unnecessary with faults and boring.
-Sememe-based Word Substituion + LS (Prediction=Positive):
-
-I’m normally a fan of Mel Gibson, but in this posture he forged a movie with a wrenching script. The acting for the most part really wasn’t that bad, but the story was just rash with flaws and boring.
-Sememe-based Word Substituion + PSO (Prediction=Positive):
-
-I’m overall a fan of Mel Gibson, but in this case he forged a movie with a wrenching script. The acting for the most part really wasn’t that bad, but the story was likely rash with vulnerabilities and boring.
-
-IMDB Example 2
-
-Original Input (Prediction=Negative)
-People, please don’t bother to watch this movie! This movie is bad! It’s totally waste of time. I don’t see any point here. It’s a stupid film with lousy plot and the acting is poor. I rather get myself beaten than watch this movie ever again.
-
-Synonym-based Word Substitution + LS (Prediction=Positive):
-People, please don’t get to watch this movie! This movie is tough! It’s totally wastefulness of time. I don’t see any point here. It ’s a stupid film with dirty plot and the acting is short. I rather get myself beaten than watch this movie ever again.
-
-Synonym-based Word Substitution + SBGS (Prediction=Positive):
-People, please don’t get to catch this movie! This movie is tough! It’s totally wasteland of time. I don’t see any degree here. It’s a stupid film with dirty plot and the acting is short. I rather get myself beaten than watch this movie ever again.
-
-Counter-fitted Word Embedding Substitution + LS (Prediction=Positive):
-People, please don’t irritate to watch this movie! This movie is wicked! It’s totally litter of time. I don’t see any point here. It’s a stupid film with miserable plot and the acting is poorer. I rather get myself beaten than watch this movie ever again.
-
-Counter-fitted Word Embedding Substitution + GA (Prediction=Positive):
-People, invited don’t irritate to watch this movie. This movie is naughty! It’s abundantly debris of time. I don’t see any point here. It’s a daft film with miserable plot and the acting is poorer. I rather get myself pummeled than watch this movie ever again.
-
-Sememe-based Word Substituion + LS (Prediction=Positive):
-People, please don’t bother to watch this movie. This movie is bad! It’s totally waste of time. I don’t see any point here.
-It’s a bookish snapshot with spongy plot and the acting is wrenching. I rather get myself beaten than watch this movie ever again.
-Sememe-based Word Substituion + PSO (Prediction=Positive):
-
-People, please don’t bother to watch this movie. This movie is bad. It’s decidedly waste of time. I don’t see any point here. It’s a stupid snapshot with off plot and the acting is wrenching. I rather get myself beaten than watch this polka ever again.
-
-introduced by Zang et al. [16] where sememe-based word substitution is used, we use LS and PSO to craft 553 ad- versarial examples respectively (8% of the original training set size) by attacking BiLSTM on the training set of SST-2. Then we include the adversarial examples into the training set and retrain a BiLSTM. Once again, we use LS and PSO to attack this new model and obtain the attack success rates. Finally, we assess the robustness improvement as the decrease in success rates after retraining. The larger the decrease, the larger the robustness improvement. The above whole proce- dure is repeated in the second scenario introduced by Ren et al. [14] with IMDB dataset and BERT, where synonym- based word substitution is used and the baseline algorithm is SBGS. Table XI and Table XII present the results. It can be observed that adversarial training indeed makes the models more robust to adversarial attacks. Moreover, the adversarial examples crafted by LS generally bring larger robustness improvement than that crafted by the baselines. Further, as the optimization algorithm for textual attack, LS is also less affected by adversarial training compared to the baselines.
-
-V. CONCLUSION   AND   DISCUSSION
-  In this paper, we propose a local search algorithm to solve the combinatorial optimization problem induced in the optimization step of word-level textual attack. We prove its approximation bound, which is also the first general per- formance guarantee in the literature. We conduct exhaustive experiments to demonstrate the superiority of our algorithm in terms of attack success rate, query efficiency, adversarial example quality, transferability and robustness improvement to victim models by adversarial training.
-  The algorithm proposed in this paper can be integrated into a wide range of textual attack frameworks, to help improve their query efficiency and success rates. As a result, our algorithm can help better find the vulnerability, unfairness and safety issues in NLP models, and therefore help mitigate them in real-world applications. On the other hand, there exists potential risk that the textual attack approaches can be used purposefully to attack the NLP models deployed in critical applications. It is therefore necessary to study how to defend against such attacks. In addition, in industry, this work also has an impact on solving the set maximization problem with partition matroids, which typically finds many applications such as service composition in cloud computing [45] and social welfare in combinatorial auctions [38].
-  There are several important future directions. The first is to further improve the query efficiency of the algorithm, especially in cases of attacking long sentences. The second is to extend the algorithm to the decision-based setting where only the top labels predicted by the victim model are available. The third future direction is to extend the algorithm to other languages, e.g., Chinese. Although the general idea of word substitution as combinatorial optimization is widely applicable to different languages, it is still necessary to customize the method when applied to a specific language. For example, in Chinese texts the words are not separated from each other; it is therefore necessary to conduct word segmentation before word
-
-substitution. Another interesting future work is to improve the performance of existing search algorithms (e.g., PSO and GA), by integrating the proposed algorithmic components such as the three types of perturbations and the termination condition into them, such that they will be assured to find local optimal solutions. Finally, it is also interesting to investigate how to automatically build an ensemble of attacks [46]–[49] to reliably evaluate the adversarial robustness of NLP models.
-
-ACKNOWLEDGMENT
-  This work was supported in part by the Guangdong Provin- cial Key Laboratory under Grant 2020B121201001; in part by the Program for Guangdong Introducing Innovative and Entrepreneurial Teams under Grant 2017ZT07X386; in part by the Science and Technology Commission of Shanghai Mu- nicipality under Grant 19511120600; in part by the National Leading Youth Talent Support Program of China; and in part by the MOE University Scientific-Technological Innovation Plan Program.
-
-REFERENCES
-[1] C. Szegedy, W. Zaremba, I. Sutskever, J. Bruna, D. Erhan, I. J. Goodfellow, and R. Fergus, “Intriguing Properties of Neural Networks,” in Proceedings of the 2nd International Conference on Learning Rep- resentations, ICLR’2014, Banff, Canada, Apr 2014.
-[2] I. J. Goodfellow, J. Shlens, and C. Szegedy, “Explaining and Harnessing Adversarial Examples,” in Proceedings of the 3rd International Confer- ence on Learning Representations, ICLR’2015, San Diego, CA, May 2015.
-[3] N. Carlini, P. Mishra, T. Vaidya, Y. Zhang, M. Sherr, C. Shields, D. A. Wagner, and W. Zhou, “Hidden Voice Commands,” in Proceedings of the 25th USENIX Security Symposium, USENIX Security’2016, Austin, TX, Aug 2016, pp. 513–530.
-[4] Y. Dong, F. Liao, T. Pang, H. Su, J. Zhu, X. Hu, and J. Li, “Boosting Adversarial Attacks With Momentum,” in Proceedings of the 28th IEEE Conference on Computer Vision and Pattern Recognition, CVPR’2018, Salt Lake City, UT, Jun 2018, pp. 9185–9193.
-[5] F. Trame`r, A. Kurakin, N. Papernot, I. J. Goodfellow, D. Boneh, and P. D. McDaniel, “Ensemble Adversarial Training: Attacks and Defenses,” in Proceedings of the 6th International Conference on Learning Represen- tations, ICLR’2018, Vancouver, Canada, Apr 2018.
-[6] E. Wong and J. Z. Kolter, “Provable Defenses against Adversarial Examples via the Convex Outer Adversarial Polytope,” in Proceedings of the 35th International Conference on Machine Learning, ICML’2018, Stockholmsma¨ssan, Sweden, July 2018, pp. 5283–5292.
-[7] A. Bhowmick and S. M. Hazarika, “E-mail Spam Filtering: A Review of Techniques and Trends,” Advances in Electronics, Communication and Computing, pp. 583–590, 2018.
-[8] N.  McLaughlin,  J.  M.  del  Rinco´n,  B.  Kang,  S.  Y.  Yerima,  P.  Miller,
-S. Sezer, Y. Safaei, E. Trickel, Z. Zhao, A. Doupe´, and G. Ahn, “Deep Android Malware Detection,” in Proceedings of the 7th ACM Confer- ence on Data and Application Security and Privacy, CODASPY’2017. Scottsdale, AZ: ACM, Mar 2017, pp. 301–308.
-[9] W. Wang, L. Wang, R. Wang, Z. Wang, and A. Ye, “Towards a Robust Deep Neural Network in Texts: A Survey,” CoRR, vol. abs/1902.07285, 2019.
-[10] M. Alzantot, Y. Sharma, A. Elgohary, B. Ho, M. B. Srivastava, and
-K. Chang, “Generating Natural Language Adversarial Examples,” in Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing, EMNLP’2018, Brussels, Belgium, Oct 2018, pp. 2890–2896.
-[11] H. Hosseini, S. Kannan, B. Zhang, and R. Poovendran, “Deceiving Google’s Perspective API Built for Detecting Toxic Comments,” CoRR, vol. abs/1702.08138, 2017.
-[12] Y. Belinkov and Y. Bisk, “Synthetic and Natural Noise Both Break Neu- ral Machine Translation,” in Proceedings of the 6th International Con- ference on Learning Representations, ICLR’2018, Vancouver, Canada, Apr 2018.
-
-[13] J. Gao, J. Lanchantin, M. L. Soffa, and Y. Qi, “Black-Box Generation of Adversarial Text Sequences to Evade Deep Learning Classifiers,” in Proceedings of the 2018 IEEE Security and Privacy Workshops, SP Workshops’2018, San Francisco, CA, May 2018, pp. 50–56.
-[14] S. Ren, Y. Deng, K. He, and W. Che, “Generating Natural Language Adversarial Examples through Probability Weighted Word Saliency,” in Proceedings of the 57th Conference of the Association for Computa- tional Linguistics, ACL’2019, Florence, Italy, Jul 2019, pp. 1085–1097.
-[15] J. Li, S. Ji, T. Du, B. Li, and T. Wang, “TextBugger: Generating Adversarial Text Against Real-world Applications,” in Proceedings of the 26th Annual Network and Distributed System Security Symposium, NDSS’2019. San Diego, CA: The Internet Society, Feb 2019.
-[16] Y. Zang, F. Qi, C. Yang, Z. Liu, M. Zhang, Q. Liu, and M. Sun, “Word- level Textual Adversarial Attacking as Combinatorial Optimization,” in Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, ACL’2020, Online, Jul 2020, pp. 6066–6080.
-[17] D. Jin, Z. Jin, J. T. Zhou, and P. Szolovits, “Is BERT Really Robust? A Strong Baseline for Natural Language Attack on Text Classification and Entailment,” in Proceedings of the 34th AAAI Conference on Artificial Intelligence, AAAI’2020, New York, NY, Feb 2020, pp. 8018–8025.
-[18] S. Tan, S. R. Joty, M. Kan, and R. Socher, “It’s Morphin’ Time! Combating Linguistic Discrimination with Inflectional Perturbations,” in Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, ACL’2020, Online, Jul 2020, pp. 2920–2935.
-[19] L. Li, R. Ma, Q. Guo, X. Xue, and X. Qiu, “BERT-ATTACK: Adversarial Attack Against BERT Using BERT,” in Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing, EMNLP’2020, Online, Nov 2020, pp. 6193–6202.
-[20] Z. Zhao, D. Dua, and S. Singh, “Generating Natural Adversarial Exam- ples,” in Proceedings of the 6th International Conference on Learning Representations, ICLR’2018, Vancouver, Canada, Apr 2018.
-[21] R. Maheshwary, S. Maheshwary, and V. Pudi, “Generating Natural Language Attacks in a Hard Label Black Box Setting,” CoRR, vol. abs/2012.14956, 2020.
-[22] M. Iyyer, J. Wieting, K. Gimpel, and L. Zettlemoyer, “Adversarial Ex- ample Generation with Syntactically Controlled Paraphrase Networks,” in Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, NAACL-HLT’2018, New Orleans, LA, Jun 2018, pp. 1875–1885.
-[23] M. T. Ribeiro, S. Singh, and C. Guestrin, “Semantically Equivalent Adversarial Rules for Debugging NLP models,” in Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics, ACL’2018, Melbourne, Australia, Jul 2018, pp. 856–865.
-[24] D. Pruthi, B. Dhingra, and Z. C. Lipton, “Combating Adversarial Misspellings with Robust Word Recognition,” in Proceedings of the 57th Conference of the Association for Computational Linguistics, ACL’2019, Florence, Italy, Jul 2019, pp. 5582–5591.
-[25] X. Wang, H. Jin, and K. He, “Natural Language Adversarial Attacks and Defenses in Word Level,” CoRR, vol. abs/1909.06723, 2019.
-[26] R. Jia and P. Liang, “Adversarial Examples for Evaluating Reading Comprehension Systems,” in Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing, EMNLP’2017, Copenhagen, Denmark, Sep 2017, pp. 2021–2031.
-[27] J. Ebrahimi, A. Rao, D. Lowd, and D. Dou, “HotFlip: White-Box Adversarial Examples for Text Classification,” in Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics, ACL’2018, Melbourne, Australia, Jul 2018, pp. 31–36.
-[28] M. Cheng, J. Yi, P. Chen, H. Zhang, and C. Hsieh, “Seq2Sick: Evaluat- ing the Robustness of Sequence-to-Sequence Models with Adversarial Examples,” in Proceedings of the 34th AAAI Conference on Artificial Intelligence, AAAI’2020, New York, NY, Feb 2020, pp. 3601–3608.
-[29] J. X. Morris, E. Lifland, J. Y. Yoo, J. Grigsby, D. Jin, and Y. Qi, “TextAttack: A Framework for Adversarial Attacks, Data Augmentation, and Adversarial Training in NLP,” in Proceedings of the 2020 Confer- ence on Empirical Methods in Natural Language Processing: System Demonstrations, EMNLP’2020.
-[30] N. Papernot, P. D. McDaniel, A. Swami, and R. E. Harang, “Craft- ing Adversarial Input Sequences for Recurrent Neural Networks,” in Proceedings of 35th IEEE Military Communications Conference, MIL- COM’2016. Baltimore, MD: IEEE, Nov 2016, pp. 49–54.
-[31] M. Sato, J. Suzuki, H. Shindo, and Y. Matsumoto, “Interpretable Adver- sarial Perturbation in Input Embedding Space for Text,” in Proceedings of the 27th International Joint Conference on Artificial Intelligence, IJCAI’2018, Stockholm, Sweden, Jul 2018, pp. 4323–4330.
-[32] B. Liang, H. Li, M. Su, P. Bian, X. Li, and W. Shi, “Deep Text Classification Can be Fooled,” in Proceedings of the 27th International
-
-Joint Conference on Artificial Intelligence, IJCAI’2018, Stockholm, Sweden, Jul 2018, pp. 4208–4215.
-[33] E. Wallace, S. Feng, N. Kandpal, M. Gardner, and S. Singh, “Universal Adversarial Triggers for Attacking and Analyzing NLP,” in Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing, EMNLP-IJCNLP’2019, Hong Kong, China, Nov 2019, pp. 2153–2162.
-[34] H. Zhang, H. Zhou, N. Miao, and L. Li, “Generating Fluent Adver- sarial Examples for Natural Languages,” in Proceedings of the 57th Conference of the Association for Computational Linguistics, ACL’2019, Florence, Italy, Jul 2019, pp. 5564–5569.
-[35] S.  Eger,  G.  G.  Sahin,  A.  Ru¨ckle´,  J.  Lee,  C.  Schulz,  M.  Mesgar,
-K. Swarnkar, E. Simpson, and I. Gurevych, “Text Processing Like Humans Do: Visually Attacking and Shielding NLP Systems,” in Pro- ceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technolo- gies, NAACL-HLT’2019, Minneapolis, MN, Jun 2019, pp. 1634–1647.
-[36] G. Cornuejols, M. L. Fisher, and G. L. Nemhauser, “Exceptional Paper—location of Bank Accounts to Optimize Float: An Analytic Study of Exact And Approximate Algorithms,” Management Science, vol. 23, no. 8, pp. 789–810, 1977.
-[37] G. L. Nemhauser, L. A. Wolsey, and M. L. Fisher, “An Analysis of Ap- proximations for Maximizing Submodular Set Functions,” Mathmatical Programming, vol. 14, no. 1, pp. 265–294, 1978.
-[38] T. Friedrich, A. Go¨bel, F. Neumann, F. Quinzan, and R. Rothenberger, “Greedy Maximization of Functions with Bounded Curvature under Par- tition Matroid Constraints,” in Proceedings of the 33rd AAAI Conference on Artificial Intelligence, AAAI’2019, Honolulu, HI, Jan 2019, pp. 2272– 2279.
-[39] J. Devlin, M. Chang, K. Lee, and K. Toutanova, “BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding,” in Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Tech- nologies, NAACL-HLT’2019, Minneapolis, MN, Jun 2019, pp. 4171– 4186.
-[40] A. L. Maas, R. E. Daly, P. T. Pham, D. Huang, A. Y. Ng, and C. Potts, “Learning Word Vectors for Sentiment Analysis,” in Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies, ACL-HLT’2011, Portland, OR, Jun 2011, pp. 142–150.
-[41] Y. Zhou and C. J. Spanos, “Causal Meets Submodular: Subset Selec- tion with Directed Information,” in Proceedings of the 29th Annual Conference on Neural Information Processing System, NeurIPS’2016, Barcelona, Spain, Dec 2016, pp. 2649–2657.
-[42] S. Moon, G. An, and H. O. Song, “Parsimonious black-box adversarial attacks via efficient combinatorial optimization,” in Proceedings of the 36th International Conference on Machine Learning, ICML’2019, Long Beach, CA, Jun 2019, pp. 4636–4645.
-[43] A. Schrijver, Combinatorial optimization: polyhedra and efficiency. Springer Science & Business Media, 2003, vol. 24.
-[44] A. Radford, J. Wu, R. Child, D. Luan, D. Amodei, and I. Sutskever, “Language Models Are Unsupervised Multitask Learners,” OpenAI blog, vol. 1, no. 8, p. 9, 2019.
-[45] S. Liu, Y. Wei, K. Tang, A. K. Qin, and X. Yao, “QoS-aware Long- term based Service Composition in Cloud Computing,” in Proceedings of the 2015 IEEE Congress on Evolutionary Computation, CEC’2015. Sendai, Japan: IEEE, May 2015, pp. 3362–3369.
-[46] S. Liu, K. Tang, Y. Lei, and X. Yao, “On Performance Estimation in Automatic Algorithm Configuration,” in Proceedings of the 34th AAAI Conference on Artificial Intelligence, AAAI’ 2020, New York, NY, Feb 2020, pp. 2384–2391.
-[47] S. Liu, K. Tang, and X. Yao, “Automatic Construction of Parallel Portfolios via Explicit Instance Grouping,” in Proceedings of the 33rd AAAI Conference on Artificial Intelligence, AAAI’ 2019, Honolulu, HI, Jan 2019, pp. 1560–1567.
-[48] ——,   “Generative   Adversarial   Construction   of   Parallel Portfolios,” IEEE Transactions on Cybernetics, 2020, in press, DOI:10.1109/TCYB.2020.2984546.
-[49] K. Tang, S. Liu, P. Yang, and X. Yao, “Few-Shots Parallel Algorithm Portfolio Construction via Co-Evolution,” IEEE Transactions on Evolu- tionary Computation, vol. 25, no. 3, pp. 595–607, 2021.
-
-TABLE XIV
-EVALUATION  RESULTS  IN  TERMS  OF  MODIFICATION  RATE  (MODI.), GRAMMATICALITY  (IPW) AND  FLUENCY  (PPL), IN  THE  SCENARIOS  INTRODUCED BY ALZANTOT et al. [10]. NOTE FOR ALL THESE THREE METRICS, THE SMALLER THE BETTER.
-
-IMDBSNLIVictim Model	Alg.Modi. (%)IPW (E-04)PPLModi. (%)IPW (E-04)	PPLGA
-LSTM	LS8.00
-5.022.505
-0.969169.19
-145.54
--
-DNNGA LS
--14.19
-14.206.863
-8.470257.50
-251.93
-TABLE XV
-EVALUATION  RESULTS  IN  TERMS  OF  MODIFICATION  RATE  (MODI.), GRAMMATICALITY  (IPW) AND  FLUENCY  (PPL), IN  THE  SCENARIOS  INTRODUCED BY REN et al. [14].
-
-IMDBAG’s NewsVictim Model	Alg.Modi. (%)IPW (E-04)PPLModi. (%)	IPW (E-04)	PPLSBGS
-BiLSTM	LS6.41
-5.992.524
-2.39996.54
-94.50
--SBGS5.931.35192.385.431.429141.99Word-CNN	LS5.260.55589.235.320.564140.98
-Char-CNNSBGS LS
--6.14
-5.601.633
-0.787151.17
-147.23
-TABLE XVI
-EVALUATION  RESULTS  IN  TERMS  OF  MODIFICATION  RATE  (MODI.), GRAMMATICALITY  (IPW) AND  FLUENCY  (PPL), IN  THE  SCENARIOS  INTRODUCED BY JIN et al. [17].
-
-BERTWord-LSTMWord-CNNDataset	Alg.Modi. (%)IPW (E-2)PPLModi. (%)IPW (E-2)PPLModi. (%)IPW (E-2)PPLIBGS9.990.786407.910.630.911409.810.570.904468.8MR	LS8.630.490533.38.780.591400.18.840.874476.5BERTInfersentESIMDataset	Alg.Modi. (%)IPW (E-2)PPLModi. (%)IPW (E-2)PPLModi. (%)IPW (E-2)PPLIBGS11.052.402329.711.252.611310.911.222.357328.1SNLI	LS9.782.196299.99.663.281316.210.211.803326.7
-TABLE XVII
-SUCCESS RATES AND AVERAGE QUERY NUMBER OF LS AND THE  GREEDY  ALGORITHM  IN  ATTACK  SCENARIOS  INTRODUCED  BY  ZANG et al. [16]. EACH TABLE CELL CONTAINS TWO VALUES, A SUCCESS RATE (%) AND  AN  AVERAGE QUERY NUMBER, SEPARATED  BY  “ ”. NOTE FOR SUCCESS RATE, THE
-HIGHER  THE  BETTER; FOR  QUERY  NUMBER, THE  SMALLER  THE  BETTER.
-
-IMDBSST-2SNLIAlg.BiLSTM	BERTBiLSTM	BERTBiLSTM	BERTLS	99.93|2220	94.16|4332	94.07|295	88.90|343	74.71|246	76.43|233 Greedy		99.83|2103		91.21|3967		93.56|257		88.65|266		74.48|173		75.78|174 
-
-
-
-APPENDIX A
-COMPLETE EVALUATION RESULTS OF ADVERSARIAL EXAMPLE QUALITY
-  Table XIV, Table XV and Table XVI list the results in terms of modification rate (Modi.), grammaticality (IPW) and fluency (PPL), in the scenarios introduced by Alzantot et al. [10], Ren et al. [14] and Jin et al. [14], respectively. It can be observed that in most scenarios the adversarial examples crafted by LS are better than that crafted by the baselines. Note the quality of the adversarial examples crafted in the scenarios of Tan et al. [18] is not evaluated. The reason is that
-
-
-it is aimed at revealing the discrimination of DNNs that are trained on perfect Standard English corpora, against minorities from nonstandard linguistic backgrounds. Under its setting the adversarial examples crafted by Inflectional Morphology will naturally introduce quality issues, such as grammatical error and typos. This is actually very different from the other three approaches which try to craft indistinguishable adversarial examples with correct grammaticality.
-
-APPENDIX B
-ATTACK PERFORMANCE OF THE GREEDY ALGORITHM
-  Table XVII presents the attack performance of LS and the Greedy algorithm in the scenarios of Zang et al. [16]. Compared to Greedy, generally LS achieves higher success rates, with a few additional queries.
-
-
