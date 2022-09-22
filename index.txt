@@ -1,0 +1,160 @@
+Bad Bunny,BossaNova,Yo No Soy Celoso,canciones/BossaNova/YoNoSoyCeloso_BadBunny.txt
+Natalia Lafourcade,BossaNova,Un Pato,canciones/BossaNova/UnPato_NataliaLafourcade.txt
+Nara Leao,BossaNova,El Barco,canciones/BossaNova/ElBarco_NaraLeao.txt
+Eugenia Leon,BossaNova,Aguas De Marzo,canciones/BossaNova/AguasDeMarzo_EugeniaLeon.txt
+Chico Buarque,BossaNova,Samba Amor,canciones/BossaNova/SambaYAmor_ChicoBuarque.txt
+Joao Gilberto,BossaNova,Ella Es Carioca,canciones/BossaNova/EllaEsCarioca_JoaoGilberto.txt
+C. Tangana,BossaNova,Comerte Entera,canciones/BossaNova/ComerteEntera_C.Tangana.txt
+Monica Naranjo,BossaNova,Insensatez,canciones/BossaNova/Insensatez_MonicaNaranjo.txt
+Tom Jobin,BossaNova,Agua De Beber,canciones/BossaNova/AguaDeBeber_TomJobin.txt
+Jarabe De Palo,BossaNova,La Chica De Ipanema,canciones/BossaNova/LaChicaDeIpanema_JarabeDePalo.txt
+Julio Sosa,Tango,Cambalache,canciones/Tango/Cambalache_JulioSosa.txt
+C. Tangana,Tango,Ateo,canciones/Tango/Ateo_C.Tangana.txt
+Julieta Venegas,Tango,Pa' Bailar,canciones/Tango/Pa'Bailar_JulietaVenegas.txt
+Anibal Troilo,Tango,Malena,canciones/Tango/Malena_AnibalTroilo.txt
+Alberto Podesta,Tango,Nada,canciones/Tango/Nada_AlbertoPodesta.txt
+Consuelo Velazquez,Tango,Besame Mucho,canciones/Tango/BesameMucho_ConsueloVelazquez.txt
+Enrique Santos Discepolo,Tango,Cafetin De Buenos Aires,canciones/Tango/CafetinDeBuenosAires_EnriqueSantosDiscepolo.txt
+Shakira,Tango,Te Aviso Te Anuncio,canciones/Tango/TeAvisoTeAnuncio_Shakira.txt
+Julio Iglesias,Tango,La Cumparsita,canciones/Tango/LaCumparsita_JulioIglesias.txt
+Carlos Gardel,Tango,Por Una Cabeza,canciones/Tango/PorUnaCabeza_CarlosGardel.txt
+Joan Sebastian,Ranchera,Tatuajes,canciones/Ranchera/Tatuajes_JoanSebastian.txt
+C. Tangana,Ranchera,Cambia!,canciones/Ranchera/Cambia!_C.Tangana.txt
+Juan Gabriel,Ranchera,Amor Eterno,canciones/Ranchera/AmorEterno_JuanGabriel.txt
+Pedro Fernandez,Ranchera,El Aventurero,canciones/Ranchera/ElAventurero_PedroFernandez.txt
+Pedro Infante,Ranchera,Ni Por Favor,canciones/Ranchera/NiPorFavor_PedroInfante.txt
+Jose Alfredo Jimenez,Ranchera,El Rey,canciones/Ranchera/ElRey_JoseAlfredoJimenez.txt
+Luis Miguel,Ranchera,Sabes Una Cosa,canciones/Ranchera/SabesUnaCosa_LuisMiguel.txt
+Cristian Nodal,Ranchera,Adios Amor,canciones/Ranchera/AdiosAmor_CristianNodal.txt
+Alejandro Fernandez,Ranchera,Matalas,canciones/Ranchera/Matalas_AlejandroFernandez.txt
+Vicente Fernandez,Ranchera,Un Millon De Primavera,canciones/Ranchera/UnMillonDePrimavera_VicenteFernandez.txt
+Girl Ultra,Soul,Ella Tu Yo,canciones/Soul/EllaTuYYo_GirlUltra.txt
+Mariah Carey,Soul,Mi Todo,canciones/Soul/MiTodo_MariahCarey.txt
+Sabino,Soul,Pelicula,canciones/Soul/Pelicula_Sabino.txt
+Roberto Carlos,Soul,Ilegal Imoral Engorda,canciones/Soul/IlegalImoralOEngorda_RobertoCarlos.txt
+Los Enanitos Verdes,Soul,Luz De Dia,canciones/Soul/LuzDeDia_LosEnanitosVerdes.txt
+Manuel Medrano,Soul,Una Otra Vez,canciones/Soul/UnaYOtraVez_ManuelMedrano.txt
+Nathy Peluso,Soul,Buenos Aires,canciones/Soul/BuenosAires_NathyPeluso.txt
+Leo Dan,Soul,Te He Prometido,canciones/Soul/TeHePrometido_LeoDan.txt
+Chita,Soul,Algo Mas,canciones/Soul/AlgoMas_Chita.txt
+Ruben Blades,Soul,Muevete,canciones/Soul/Muevete_RubenBlades.txt
+Agustín Lara,Bolero,Solamente Una Vez,canciones/Bolero/SolamenteUnaVez_AgustínLara.txt
+Maria Luisa Landin,Bolero,Amor Perdido,canciones/Bolero/AmorPerdido_MariaLuisaLandin.txt
+Los Dandys,Bolero,Gema,canciones/Bolero/Gema_LosDandys.txt
+Oscar Chavez,Bolero,Flor De Azalea,canciones/Bolero/FlorDeAzalea_OscarChavez.txt
+Armando Manzanero,Bolero,Nada Personal,canciones/Bolero/NadaPersonal_ArmandoManzanero.txt
+Los Panchos,Bolero,Mar Cielo,canciones/Bolero/MarYCielo_LosPanchos.txt
+La Sonora Santanera,Bolero,Perfume De Gardenia,canciones/Bolero/PerfumeDeGardenia_LaSonoraSantanera.txt
+Javier Solis,Bolero,Retirada,canciones/Bolero/Retirada_JavierSolis.txt
+Pedro Infante,Bolero,Cien Años,canciones/Bolero/CienAños_PedroInfante.txt
+Maria Victoria,Bolero,Cuidadito,canciones/Bolero/Cuidadito_MariaVictoria.txt
+Los Hermanos Rosario,Merengue,La Dueña Del Swing,canciones/Merengue/LaDueñaDelSwing_LosHermanosRosario.txt
+Sergio Vargas,Merengue,La Ventanita,canciones/Merengue/LaVentanita_SergioVargas.txt
+Wilfrido Vargas,Merengue,El Mono,canciones/Merengue/ElMono_WilfridoVargas.txt
+Los Cantantes,Merengue,El Venao,canciones/Merengue/ElVenao_LosCantantes.txt
+Bad Bunny,Merengue,Despues De La Playa,canciones/Merengue/DespuesDeLaPlaya_BadBunny.txt
+Juan Luis Guerra,Merengue,Bilirrubina,canciones/Merengue/Bilirrubina_JuanLuisGuerra.txt
+Elvis Crespo,Merengue,Suavemente,canciones/Merengue/Suavemente_ElvisCrespo.txt
+Merenglass,Merengue,La Mujer Del Pelotero,canciones/Merengue/LaMujerDelPelotero_Merenglass.txt
+Fuego,Merengue,Una Vaina Loca,canciones/Merengue/UnaVainaLoca_Fuego.txt
+Fulanito,Merengue,Guallando,canciones/Merengue/Guallando_Fulanito.txt
+Margarita La Diosa De La Cumbia,Cumbia,Que Nadie Sepa Mi Sufrir,canciones/Cumbia/QueNadieSepaMiSufrir_MargaritaLaDiosaDeLaCumbia.txt
+Los Angeles De Charly,Cumbia,Me Volvia Acordar De Ti,canciones/Cumbia/MeVolviaAcordarDeTi_LosAngelesDeCharly.txt
+Grupo Cañaveral,Cumbia,Tiene Espinas El Rosal,canciones/Cumbia/TieneEspinasElRosal_GrupoCañaveral.txt
+Rayito Colombiano,Cumbia,Muchachita Consentida,canciones/Cumbia/MuchachitaConsentida_RayitoColombiano.txt
+Alberto Barros,Cumbia,Bonita Mentirosa,canciones/Cumbia/BonitaYMentirosa_AlbertoBarros.txt
+Grupo Soñador,Cumbia,El Paso Del Gigante,canciones/Cumbia/ElPasoDelGigante_GrupoSoñador.txt
+Raymix,Cumbia,Oye Mujer,canciones/Cumbia/OyeMujer_Raymix.txt
+Aaron Su Grupo Ilusion,Cumbia,El Embrujo,canciones/Cumbia/ElEmbrujo_AaronYSuGrupoIlusion.txt
+Los Socios Del Ritmo,Cumbia,Llorar,canciones/Cumbia/Llorar_LosSociosDelRitmo.txt
+Los Angeles Azules,Cumbia,Como Te Voy Olvidar,canciones/Cumbia/ComoTeVoyAOlvidar_LosAngelesAzules.txt
+Control Machete,HipHop_Rap,Comprendes Mendes,canciones/HipHop_Rap/ComprendesMendes_ControlMachete.txt
+Tino El Pinguino,HipHop_Rap,Fractubela,canciones/HipHop_Rap/Fractubela_TinoElPinguino.txt
+Lng Sht,HipHop_Rap,La Insoportable Levedad Del Ser,canciones/HipHop_Rap/LaInsoportableLevedadDelSer_LngSht.txt
+Sabino,HipHop_Rap,Colorin Colorado,canciones/HipHop_Rap/ColorinColorado_Sabino.txt
+Cartel De Santa,HipHop_Rap,Leve,canciones/HipHop_Rap/Leve_CartelDeSanta.txt
+Aleman,HipHop_Rap,Tantas Veces,canciones/HipHop_Rap/TantasVeces_Aleman.txt
+Duki,HipHop_Rap,Givenchy,canciones/HipHop_Rap/Givenchy_Duki.txt
+Canserbero,HipHop_Rap,Es Epico,canciones/HipHop_Rap/EsEpico_Canserbero.txt
+C. Tangana,HipHop_Rap,Parteme La Cara,canciones/HipHop_Rap/PartemeLaCara_C.Tangana.txt
+La Banda Baston,HipHop_Rap,Me Gustas,canciones/HipHop_Rap/MeGustas_LaBandaBaston.txt
+Benny More,Mambo,Bonito Sabroso,canciones/Mambo/BonitoYSabroso_BennyMore.txt
+La Sonora Santanera,Mambo,Bomboro Quiña Quiña,canciones/Mambo/BomboroQuiñaQuiña_LaSonoraSantanera.txt
+Lou Bega,Mambo,Mambo No5,canciones/Mambo/MamboNo5_LouBega.txt
+Cachao Lopez,Mambo,Cogele El Golpe,canciones/Mambo/CogeleElGolpe_CachaoLopez.txt
+Perez Prado,Mambo,Que Rico El Mambo,canciones/Mambo/QueRicoElMambo_PerezPrado.txt
+Celia Cruz,Mambo,Tu Voz,canciones/Mambo/TuVoz_CeliaCruz.txt
+Tito Rodriguez,Mambo,Piel Canela,canciones/Mambo/PielCanela_TitoRodriguez.txt
+Mon Laferte,Mambo,El Mambo,canciones/Mambo/ElMambo_MonLaferte.txt
+Tito Puente,Mambo,Oye Como Va,canciones/Mambo/OyeComoVa_TitoPuente.txt
+Charlie Palmieri,Mambo,Porque Me Engañas,canciones/Mambo/PorqueMeEngañas_CharliePalmieri.txt
+Manal,Blues,Jugo De Tomate,canciones/Blues/JugoDeTomate_Manal.txt
+Los Del Tonos,Blues,Gasolina,canciones/Blues/Gasolina_LosDelTonos.txt
+Luis Alberto Spinetta,Blues,Despiertate Nena,canciones/Blues/DespiertateNena_LuisAlbertoSpinetta.txt
+Vox  Dei,Blues,Génesis,canciones/Blues/Génesis_Vox Dei.txt
+Pappo,Blues,Desconfio,canciones/Blues/Desconfio_Pappo.txt
+Memphis La Blusera,Blues,Coraje,canciones/Blues/Coraje_MemphisLaBlusera.txt
+Real De Catorce,Blues,Beso De Ginebra,canciones/Blues/BesoDeGinebra_RealDeCatorce.txt
+Prestidigitadores,Blues,Blues Del Perdedor,canciones/Blues/BluesDelPerdedor_Prestidigitadores.txt
+King,Blues,La Emoción Se Ha Ido,canciones/Blues/LaEmociónSeHaIdo_BBKing.txt
+Joaquin Sabina,Blues,El Blues De Lo Que Pasa En Mi Escalera,canciones/Blues/ElBluesDeLoQuePasaEnMiEscalera_JoaquinSabina.txt
+Shakira,Pop,Te Felicito,canciones/Pop/TeFelicito_Shakira.txt
+Miranda!,Pop,Perfecta,canciones/Pop/Perfecta_Miranda!.txt
+Morat,Pop,No Se Va,canciones/Pop/NoSeVa_Morat.txt
+Duki,Pop,Antes De Perderte,canciones/Pop/AntesDePerderte_Duki.txt
+Lasso,Pop,Ojos Marrones,canciones/Pop/OjosMarrones_Lasso.txt
+Reik,Pop,Yo Quisiera,canciones/Pop/YoQuisiera_Reik.txt
+Luis Miguel,Pop,Ahora Te Puedes Marchar,canciones/Pop/AhoraTePuedesMarchar_LuisMiguel.txt
+Esteman,Pop,Noche Sensorial,canciones/Pop/NocheSensorial_Esteman.txt
+Bizarrap,Pop,Quevedo ( Bzrp  Mussic  Session #52),canciones/Pop/Quevedo (Bzrp Mussic Session #52)_Bizarrap.txt
+Sebastian Yatra,Pop,Tacones Rojos,canciones/Pop/TaconesRojos_SebastianYatra.txt
+Pablo Milanes,Trova,Yolanda,canciones/Trova/Yolanda_PabloMilanes.txt
+Fernando Delgadillo,Trova,Hoy Ten Miedo De Mi,canciones/Trova/HoyTenMiedoDeMi_FernandoDelgadillo.txt
+Joan Manuel Serrat,Trova,Aquellas Pequeñas Cosas,canciones/Trova/AquellasPequeñasCosas_JoanManuelSerrat.txt
+Fernando Delgadillo,Trova,Entre Pairos Derivas,canciones/Trova/EntrePairosYDerivas_FernandoDelgadillo.txt
+Joaquin Sabina,Trova,Contigo,canciones/Trova/Contigo_JoaquinSabina.txt
+Silvio Rodriguez,Trova,La Cancion De La Trova,canciones/Trova/LaCancionDeLaTrova_SilvioRodriguez.txt
+Alejandro Filio,Trova,Brazos De Sol,canciones/Trova/BrazosDeSol_AlejandroFilio.txt
+Facundo Cabral,Trova,No Soy De Aqui Ni Soy De Alla,canciones/Trova/NoSoyDeAquiNiSoyDeAlla_FacundoCabral.txt
+Manuel Garcia,Trova,El Reino Del Tiempo,canciones/Trova/ElReinoDelTiempo_ManuelGarcia.txt
+Carlos Macias,Trova,Divina Tu,canciones/Trova/DivinaTu_CarlosMacias.txt
+Piso21,Reggaeton,Mato Mi Corazon,canciones/Reggaeton/MatoMiCorazon_Piso21.txt
+Balvin,Reggaeton,Ay Vamos,canciones/Reggaeton/AyVamos_JBalvin.txt
+Reik,Reggaeton,Los Tragos,canciones/Reggaeton/LosTragos_Reik.txt
+Danny Ocean,Reggaeton,Me Rehuso,canciones/Reggaeton/MeRehuso_DannyOcean.txt
+Bad Bunny,Reggaeton,La Dificil,canciones/Reggaeton/LaDificil_BadBunny.txt
+Sebastian Yatra,Reggaeton,Traicionera,canciones/Reggaeton/Traicionera_SebastianYatra.txt
+Paulo Londra,Reggaeton,Tal Vez,canciones/Reggaeton/TalVez_PauloLondra.txt
+Duki,Reggaeton,Top5,canciones/Reggaeton/Top5_Duki.txt
+,Reggaeton,Antes De Morirme- C. Tangana,canciones/Reggaeton/AntesDeMorirme-C.Tangana.txt
+Shakira,Reggaeton,Chantaje,canciones/Reggaeton/Chantaje_Shakira.txt
+Marc Anthony,Salsa,Vivir Mi Vida,canciones/Salsa/VivirMiVida_MarcAnthony.txt
+Grupo Niche,Salsa,Gotas De Lluvia,canciones/Salsa/GotasDeLluvia_GrupoNiche.txt
+Willie Colon,Salsa,Talento De Television,canciones/Salsa/TalentoDeTelevision_WillieColon.txt
+Chichi Peralta,Salsa,Procura,canciones/Salsa/Procura_ChichiPeralta.txt
+Oscar D' Leon,Salsa,Lloraras,canciones/Salsa/Lloraras_OscarD'Leon.txt
+Willie Colon,Salsa,El Gran Varon,canciones/Salsa/ElGranVaron_WillieColon.txt
+Frankie Ruiz,Salsa,Tu Con El,canciones/Salsa/TuConEl_FrankieRuiz.txt
+Maelo Ruiz,Salsa,Te Va Doler,canciones/Salsa/TeVaADoler_MaeloRuiz.txt
+Eddie Santiago,Salsa,Que Locura Enamorame De Ti,canciones/Salsa/QueLocuraEnamorameDeTi_EddieSantiago.txt
+Adalberto Santiago,Salsa,La Noche Mas Linda,canciones/Salsa/LaNocheMasLinda_AdalbertoSantiago.txt
+Los Prisioneros,Rock,Tren Al Sur,canciones/Rock/TrenAlSur_LosPrisioneros.txt
+Soda Stereo,Rock,Nada Personal,canciones/Rock/NadaPersonal_SodaStereo.txt
+Cafe Tacuba,Rock,Aprovechate,canciones/Rock/Aprovechate_CafeTacuba.txt
+Mon Laferte,Rock,Tu Falta De Querer,canciones/Rock/TuFaltaDeQuerer_MonLaferte.txt
+Jarabe De Palo,Rock,La Flaca,canciones/Rock/LaFlaca_JarabeDePalo.txt
+Beta,Rock,Salvador,canciones/Rock/Salvador_Beta.txt
+Paulo Londra,Rock,Plan,canciones/Rock/PlanA_PauloLondra.txt
+Shakira,Rock,Donde Estan Los Ladrones,canciones/Rock/DondeEstanLosLadrones_Shakira.txt
+Pxndx,Rock,Procedimientos Para Llegar Un Comun Acuerdo,canciones/Rock/ProcedimientosParaLlegarAUnComunAcuerdo_Pxndx.txt
+Los Enanitos Verdes,Rock,La Muralla Verde,canciones/Rock/LaMurallaVerde_LosEnanitosVerdes.txt
+Cafe Tacuba,Jazz,Maria,canciones/Jazz/Maria_CafeTacuba.txt
+Frank Sinatra,Jazz,Fly Me To The Moon,canciones/Jazz/FlyMeToTheMoon_FrankSinatra.txt
+Ella Fitzgerald,Jazz,Te Para Dos,canciones/Jazz/TeParaDos_EllaFitzgerald.txt
+Louis Armstrong,Jazz,What Wonderful World,canciones/Jazz/WhatAWonderfulWorld_LouisArmstrong.txt
+Antonio Sanchez,Jazz,Mi Palabra,canciones/Jazz/MiPalabra_AntonioSanchez.txt
+Nina Simone,Jazz,Sinnerman,canciones/Jazz/Sinnerman_NinaSimone.txt
+Gary Coleman,Jazz,The Sky Is Crying,canciones/Jazz/TheSkyIsCrying_GaryColeman.txt
+Nat King Cole,Jazz,Love,canciones/Jazz/Love_NatKingCole.txt
+Magos Herrera,Jazz,Luz De Luna,canciones/Jazz/LuzDeLuna_MagosHerrera.txt
+Sarah Vaughan,Jazz,Misty,canciones/Jazz/Misty_SarahVaughan.txt
