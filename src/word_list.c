@@ -22,7 +22,7 @@ word_list *lazy_get_word_list(list_list *list, const char *name)
     }
     else
     {
-        int cmp = strcmp((list->head)->name, name);
+        int cmp = strcasecmp((list->head)->name, name);
         if (cmp > 0)
         {
             // new head
@@ -42,7 +42,7 @@ word_list *lazy_get_word_list(list_list *list, const char *name)
             // current->next->data < new_node->data
             while (curr->next != NULL)
             {
-                cmp = strcmp((curr->next)->name, name);
+                cmp = strcasecmp((curr->next)->name, name);
                 if (cmp < 0)
                     curr = curr->next;
                 else
@@ -72,7 +72,7 @@ void add_word(word_list *list, const char *word)
     }
     else
     {
-        int cmp = strcmp((list->head)->word, word);
+        int cmp = strcasecmp((list->head)->word, word);
         if (cmp > 0)
         {
             // new head
@@ -89,7 +89,7 @@ void add_word(word_list *list, const char *word)
             struct word_node *curr = list->head;
             while (curr->next != NULL)
             {
-                cmp = strcmp((curr->next)->word, word);
+                cmp = strcasecmp((curr->next)->word, word);
                 if (cmp < 0)
                     curr = curr->next;
                 else
