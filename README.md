@@ -1,10 +1,16 @@
-Building:
+### Configure:
 
 ```
-cmake --build build --target all -v --
+cmake -S . -B ./build
 ```
 
-Running:
+### Building:
+
+```
+cmake --build ./build --target all --
+```
+
+### Running:
 
 ```
 ./build/canciones [<args>]
