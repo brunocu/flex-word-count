@@ -1,7 +1,7 @@
 Building:
 
 ```
-cmake --build .
+cmake --build build --target all -v --
 ```
 
 Running:
