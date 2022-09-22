@@ -22,7 +22,7 @@ int reg_ret;
 const char PAT_VOWEL[] = "[aeiou]+";
 regex_t *re_vowel = NULL;
 
-const char PAT_Y[] = "[^y].*y.*";
+const char PAT_Y[] = "([^y].*y.*)|(^y$)";
 regex_t *re_y = NULL;
 %}
 %option array
