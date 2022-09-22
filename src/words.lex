@@ -48,7 +48,7 @@ LETRA   [[:alpha:]]
 int main(int argc, char * argv[])
 {
     	++argv;
-    	--argc;  
+    	--argc;
     	if (argc > 0)
             yyin = fopen( argv[0], "r" );
     	else

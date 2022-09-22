@@ -22,8 +22,9 @@ MACRO(LEX_FILE _filename)
         DEPENDS ${_filename} )
 ENDMACRO(LEX_FILE)
 
-LEX_FILE(words.lex)
+LEX_FILE(src/words.lex)
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/words.c GENERATED)
-# include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_compile_definitions(__STDC_WANT_LIB_EXT2__=1)
 
-add_executable(canciones words.c)
+add_executable(canciones words.c src/word_list.c)
