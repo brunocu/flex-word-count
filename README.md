@@ -1,11 +1,17 @@
-Building:
+### Configure:
 
 ```
-cmake --build .
+cmake -S . -B ./build
 ```
 
-Running:
+### Building:
 
 ```
-./build/word_count [<args>]
+cmake --build ./build --target all --
+```
+
+### Running:
+
+```
+./build/canciones [<args>]
 ```
