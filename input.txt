@@ -1,0 +1,26 @@
+Efficient Combinatorial Optimization for Word-level Adversarial Textual Attack
+Shengcai Liu, Member, IEEE, Ning Lu, Student Member, IEEE, Cheng Chen, Member, IEEE, Ke Tang, Senior Member, IEEE,
+
+
+inicio
+
+  Abstract�Over the past few years, various word-level textual attack approaches have been proposed to reveal the vulnerability of deep neural networks used in natural language processing. Typically, these approaches involve an important optimization step to determine which substitute to be used for each word in the original input. However, current research on this step is still rather limited, from the perspectives of both problem- understanding and problem-solving. In this paper, we address these issues by uncovering the theoretical properties of the problem and proposing an efficient local search algorithm (LS) to solve it. We establish the first provable approximation guarantee on solving the problem in general cases. Extensive experiments involving 5 NLP tasks, 8 datasets and 26 NLP models show that LS can largely reduce the number of queries usually by an order of magnitude to achieve high attack success rates. Further experiments show that the adversarial examples crafted by LS usually have higher quality, exhibit better transferability, and can bring more robustness improvement to victim models by adversarial training.
+  Index Terms�textual attack, adversarial examples, word-level substitution, combinatorial optimization
+
+I. INTRODUCTION
+
+
+Original Input
+
+Substitute Words
+
+Adversarial Example
+
+Fig. 1. Simple examples showing sememe-based word substitution [16] (the left) and synonym-based word substitution [14] (the right), as well as the final crafted adversarial examples.
+
+
+model weights or gradients, but can only submit a limited number of input queries and then receive the corresponding model predictions. These facts give rise to the black-box approaches that directly modify the original input to craft adversarial examples, without utilizing the internal information of the victim models. Depending on where the modification is applied, these approaches can be further categorized into character-level manipulation [11]�[13], word-level substitution [10], [14]�[21], and sentence-level paraphrasing [22], [23].
+
+     NDERSTANDING the vulnerability of deep neural net- works (DNNs) to adversarial examples [1], [2] has emerged as an important research area, due to the wide range of applications of DNNs. Generally, adversarial examples are crafted by maliciously perturbing the original input, with the goal of fooling the target DNNs into producing undesirable behavior. In image classification and speech recognition, ex- tensive studies have been conducted for devising effective adversarial attacks [2]�[5], as well as further improving ro-
+bustness and interpretability of DNNs [6].
+  
