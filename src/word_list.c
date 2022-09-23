@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <dirent.h>
 
 void init_list(list_list *list)
 {
@@ -50,7 +52,7 @@ word_list *lazy_get_word_list(list_list *list, const char *name)
             }
             if (cmp == 0)
             {
-                return curr;
+                return (curr->next);
             }
             else
             {
@@ -97,7 +99,7 @@ void add_word(word_list *list, const char *word)
             }
             if (cmp == 0)
             {
-                curr->count++;
+                (curr->next)->count++;
             }
             else
             {
@@ -146,6 +148,46 @@ void print_list_list(list_list *list)
             word = word->next;
         }
         printf("List=\"%s\",words=%d\n", word_list_ptr->name, word_tot);
+        word_list_ptr = word_list_ptr->next;
+    }
+}
+
+
+void generate_csv(list_list *list, const char *list_name){
+    word_list *word_list_ptr = list->head;
+    //Check if dir exists.
+    if(opendir(list_name)){
+        //Creating a new dir with LIST_NAME as name. S_IRWXU stablishes permissions (Read,Write,Execute by owner)
+            int dir = mkdir(list_name,S_IRWXU);
+    }
+    
+    while (word_list_ptr)
+    {
+        FILE *fp = NULL;
+        int unique_word_tot = 0;
+        double percent = 0;
+        int total_words = 0;
+        struct word_node *word = word_list_ptr->head;
+        char PathFile[500];
+        sprintf(PathFile, "%s/%s.csv",list_name, word_list_ptr->name);
+        fp = fopen(PathFile,"w");
+        fprintf(fp,"Palabra, veces usada, porcentaje\n");
+        while(word){
+            unique_word_tot++;
+            total_words += word->count;
+            word = word->next;
+        }
+        word = word_list_ptr->head;
+        while (word)
+        {
+            percent = ((word->count/(float)total_words) * 100);
+            fprintf(fp,"%s,%u,%f\%\n",word->word, word->count, percent);
+            word = word->next;
+        }
+        fprintf(fp, "Total de palabras unicas usadas: %d\n", unique_word_tot);
+        fprintf(fp, "Total de palabras (repetidas): %d\n", total_words);
+        fprintf(fp, "Porcentaje de vocabulario distinto: %f\n", (unique_word_tot/(float)total_words) * 100);
+        fclose(fp);
         word_list_ptr = word_list_ptr->next;
     }
 }

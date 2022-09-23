@@ -23,3 +23,4 @@ word_list* new_word_list_init(const char *name);
 struct word_node* new_node_init(const char *word);
 
 void print_list_list(list_list *list);
+void generate_csv(list_list *list, const char *list_name);

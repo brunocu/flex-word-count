@@ -19,7 +19,7 @@ int file_stack_ptr = 0;
 // C regex
 int reg_ret;
 
-const char PAT_VOWEL[] = "[aeiou]+";
+const char PAT_VOWEL[] = "[aeiouáéíóú]+";
 regex_t *re_vowel = NULL;
 
 const char PAT_Y[] = "([^y].*y.*)|(^y$)";
@@ -31,7 +31,7 @@ regex_t *re_y = NULL;
 
 %x SONG
 
-LETRA   [[:alpha:]]
+LETRA   [[:alpha:]áéíóúñ]
 %%
  /* index rules */
 [^,\r\n]+       {
@@ -77,7 +77,7 @@ LETRA   [[:alpha:]]
     }
     bool has_vowel = false;
     // All words have at least 1 vowel
-    reg_ret = regexec(re_vowel, yytext, 0, NULL, 0);    // /[aeiou]+/i
+    reg_ret = regexec(re_vowel, yytext, 0, NULL, 0);    // /[aeiouáéíóú]+/i
     if (reg_ret != 0)
     {
         // edge case: y
@@ -136,9 +136,11 @@ int main(int argc, char * argv[])
         yylex();
         // TODO TEST PRINT, CHANGE TO OUTPUT FILE
         printf("---ARTISTS---\n");
-        print_list_list(&artist_list);
+        //print_list_list(&artist_list);
+        generate_csv(&artist_list, "artistas");
         printf("---GENRES---\n");
-        print_list_list(&genre_list);
+        //print_list_list(&genre_list);
+        generate_csv(&genre_list, "generos");
 
         // TODO FREE LIST MEMORY
         // free regex compile
